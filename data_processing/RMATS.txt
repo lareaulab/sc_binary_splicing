@@ -1,0 +1,19 @@
+# RMATS was run in order to get a comprehensive pool of cassette exons in the reference annotation
+
+
+# Example of RMATS run
+
+DIR="/mnt/lareaulab/cfbuenabadn/RNASeq/Human/Trapnell/SRP033135"
+OUT="/mnt/lareaulab/cfbuenabadn/RNASeq/Human/Trapnell/splicing/rMATS/output"
+BAM="star_output/Aligned.sortedByCoord.out.bam"
+mkdir output
+
+# H00 vs H24
+mkdir $OUT/H24
+python ~/software/rMATS.3.2.5/RNASeq-MATS.py -b1 $DIR/SRR1033282_1/$BAM,$DIR/SRR1033283_1/$BAM,$DIR/SRR1033284_1/$BAM \
+                                             -b2 $DIR/SRR1033285_1/$BAM,$DIR/SRR1033286_1/$BAM,$DIR/SRR1033287_1/$BAM \
+                                             -gtf ~/Genomes/Human/hg38/gencode.v24.annotation.gtf \
+                                             -o $OUT/H24 \
+                                             -t paired \
+                                             -len 100 \
+                                             -c 0.0001
