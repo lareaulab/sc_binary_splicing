@@ -1,0 +1,23 @@
+# Index building
+
+STAR --runThreadN 5 \
+     --runMode genomeGenerate \
+     --genomeDir STAR_100_index \
+     --genomeFastaFiles GRCm38.primary_assembly.genome.fa \
+     --sjdbGTFfile gencode.vM10.annotation.gtf \
+     --sjdbOverhang 100
+
+
+# Example run for single-end cell
+
+/data/yosef2/users/cfbuenabadn/software/STAR-2.5.3a/bin/Linux_x86_64/STAR --runThreadN 4 \
+                                                                          --genomeDir /data/yosef2/users/cfbuenabadn/mm10/STAR_100_index \
+                                                                          --readFilesIn SRR2727450.fastq \ # a second fastq file is listed for paired-end datasets
+                                                                          --quantMode GeneCounts \
+                                                                          --twopassMode Basic \
+                                                                          --outFileNamePrefix /data/yosef2/scratch/cfbuenabadn/ChenRNASeq/SRR2727450/star_output/ \
+                                                                          --outSAMstrandField intronMotif \
+                                                                          --outSAMtype BAM SortedByCoordinate \
+                                                                          --outReadsUnmapped Fastx
+
+Note: STAR performs soft-trimming of reads (Doubin et al, 2013). Therefore, we do not run trimmomatic before mapping.

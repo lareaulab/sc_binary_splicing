@@ -1,0 +1,23 @@
+# Make RSEM index
+/opt/pkg/rsem-1.2.31/bin/rsem-prepare-reference \
+                       --star \
+                       --gtf gencode.vM10.annotation.gtf \
+                       GRCm38.primary_assembly.genome.fa \
+                       rsem_index/rsem_mm10
+
+
+# Trimmomatic; doesn't affect much the results, since STAR performs soft trimming (this is an earlier implementation)
+java -jar /opt/pkg/Trimmomatic-0.32/trimmomatic-0.32.jar SE -threads 4 -phred33 \
+                                                            -trimlog /data/yosef2/scratch/cfbuenabadn/Chen/RSEM/SRR2727272/trimmomatic_output/trimmomatic_log.txt \
+                                                            /data/yosef2/users/cfbuenabadn/Neurogenesis/data/Chen/SRP064979/SRR2727272/SRR2727272.fastq  \
+                                                            /data/yosef2/scratch/cfbuenabadn/Chen/RSEM/SRR2727272/trimmomatic_output/1.Utrim.fastq
+
+# Run RSEM
+/opt/pkg/rsem-1.2.31/bin/rsem-calculate-expression --num-threads 4 --star --star-path /data/yosef2/users/cfbuenabadn/software/STAR-2.5.3a/bin/Linux_x86_64 \
+                                                   --single-cell-prior --sampling-for-bam --output-genome-bam --sort-bam-by-coordinate --sort-bam-memory-per-thread 1G \
+                                                   --estimate-rspd --fragment-length-mean 200 --fragment-length-sd 80 \
+                                                   /data/yosef2/scratch/cfbuenabadn/Chen/RSEM/SRR2727272/trimmomatic_output/1.Utrim.fastq \
+                                                   /data/yosef2/users/cfbuenabadn/mm10/rsem_index/rsem_mm10 \
+                                                   /data/yosef2/scratch/cfbuenabadn/Chen/RSEM/SRR2727272/rsem_output/rsem_output
+
+
