@@ -32,8 +32,8 @@ par(mar=c(1,1,1,1))
 
 # 1. Get the data and metadata.
 
-counts <- read.table('chen.tpm.gene_symbols.tab', header = TRUE, row.names = 1)
-meta <- read.table('meta.tab', sep = '\t',
+counts <- read.table('../data/chen/chen.tpm.gene_symbols.tab', header = TRUE, row.names = 1)
+meta <- read.table('../data/chen/meta.tab', sep = '\t',
                    header = TRUE, row.names = 1)
 
 neurogenesis_types = c('ES2i', 'ES', 'Epi', 'Motor neuron')
