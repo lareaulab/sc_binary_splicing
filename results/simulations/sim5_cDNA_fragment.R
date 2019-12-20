@@ -20,9 +20,9 @@ for (sim in 1:50) {
 
     gene_len <- sample(c(1:1000),1000,replace=FALSE)+1000
     
-    lapply(gene_len, write, paste('sim6/gene_length', suffix1, 'txt', sep='.'), append=TRUE, ncolumns=1000)
+    lapply(gene_len, write, paste('sim5/gene_length', suffix1, 'txt', sep='.'), append=TRUE, ncolumns=1000)
 
-    write.table(mrna$cell_meta, paste('sim6/meta_cell', suffix1, 'tab', sep='.'), 
+    write.table(mrna$cell_meta, paste('sim5/meta_cell', suffix1, 'tab', sep='.'), 
                 quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
 
     I_matrix = floor((mrna$counts) / 2)
@@ -38,10 +38,10 @@ for (sim in 1:50) {
       
         observed_reads <- True2ObservedCounts(true_counts=mrna_matrix, meta_cell=mrna$cell_meta, protocol="nonUMI", alpha_sd=0.002,                                                       gene_len=gene_len, depth_mean=1e5, depth_sd=3e3, lenslope=0.01, nPCR1=pcr1, nPCR2=pcr2)
 
-        write.table(mrna_matrix, paste('sim6/true_counts', suffix, 'tab', sep='.'), 
+        write.table(mrna_matrix, paste('sim5/true_counts', suffix, 'tab', sep='.'), 
                     quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
 
-        write.table(observed_reads[[1]], paste('sim6/observed_counts', suffix, 'tab', sep='.'), 
+        write.table(observed_reads[[1]], paste('sim5/observed_counts', suffix, 'tab', sep='.'), 
                     quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
 
 

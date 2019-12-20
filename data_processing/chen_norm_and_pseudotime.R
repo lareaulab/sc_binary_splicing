@@ -388,7 +388,7 @@ boxplot(t[bio=='ES2i'], t[bio=='ES'], t[bio=='Epi'], t[bio=='Motor neuron'])
 pseudo_curve <- data.frame(attributes(SlingshotDataSet(sce_psi))$curves$curve1$s)
 pseudo_curve$ord <- attributes(SlingshotDataSet(sce_psi))$curves$curve1$ord
 
-write.table(pseudo_curve, 'psi_pseudotime.tab', quote = FALSE, sep='\t')
+write.table(pseudo_curve, '../data/chen/psi_pseudotime.tab', quote = FALSE, sep='\t')
 
 
 
@@ -422,4 +422,4 @@ lineage_df <- cbind(lineage_df, pseudo_curve)
 lineage_df$pseudotime <- t
 lineage_df$cell_type <- bio
 
-write.table(lineage_df, 'chen.pca.tab', quote = FALSE, sep='\t')
+write.table(lineage_df, '../data/chen/chen.pca.tab', quote = FALSE, sep='\t')
