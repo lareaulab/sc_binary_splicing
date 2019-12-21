@@ -1,5 +1,7 @@
 # sc_binary_splicing
-Dataset analysis, simulations and figures from [preprint url to be added]
+Dataset analysis, simulations and figures from https://www.biorxiv.org/content/10.1101/2019.12.19.883256v1
+
+**Coverage-dependent bias creates the appearance of binary splicing in single cells**
 
 Single cell RNA sequencing provides powerful insight into the factors that determine each cell’s unique identity, including variation in transcription and RNA splicing among diverse cell types. Previous studies led to the surprising observation that alternative splicing outcomes among single cells are highly variable and follow a bimodal pattern: a given cell consistently produces either one or the other isoform for a particular splicing choice, with few cells producing both isoforms. Here we show that this pattern arises almost entirely from technical limitations. We analyzed single cell alternative splicing in human and mouse single cell RNA-seq datasets, and modeled them with a probabilistic simulator. Our simulations show that low gene expression and low capture efficiency distort the observed distribution of isoforms in single cells. This gives the appearance of a binary isoform distribution, even when the underlying reality is consistent with more than one isoform per cell. We show that accounting for the true amount of information recovered can produce biologically meaningful measurements of splicing in single cells. 
 
