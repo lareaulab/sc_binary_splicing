@@ -182,7 +182,8 @@ lescroart_coverage_tab = lescroart_coverage_tab.loc[lescroart_index]
 lescroart_E6 = lescroart_pca.loc[lescroart_pca.cell_type=='E6.75'].index
 lescroart_E7 = lescroart_pca.loc[lescroart_pca.cell_type=='E7.25'].index
 
-def process_subpop(subpop, psi, mrna, mrna_per_event, reads, cj, psi_min = 0.2, mrna_min=10, reads_min = 0, cell_min = 0.5, nbins=11):
+def process_subpop(subpop, psi, mrna, mrna_per_event, reads, cj, psi_min = 0.2, mrna_min=10, reads_min = 0, cell_min = 0.5, nbins=11,
+                  filter_cj = True):
 
     int_genes, int_exons = spu.get_int_events(psi[subpop], mrna[subpop], psi_min)
     #print(len(int_genes))
@@ -190,7 +191,7 @@ def process_subpop(subpop, psi, mrna, mrna_per_event, reads, cj, psi_min = 0.2, 
     PSI_filtered, PSI_mrna_filtered, good_exons, mrna_filtered, reads_filtered = filter_psi(psi[subpop], int_exons, 
                                                                      mrna_per_event[subpop], cj.loc[subpop], 
                                                                      reads[subpop], mrna_min, reads_min = reads_min,
-                                                                                            cell_min=cell_min)
+                                                                                            cell_min=cell_min, filter_cj=filter_cj)
 
 
     good_cells = PSI_filtered.dropna(axis=1, how='all').columns
@@ -264,8 +265,8 @@ lescroart_pca_clust['AC'] = ac_clusters
 
 
 lescroart_clust_filter = []
-for cluster in range(3):
-    clust_subpop = lescroart_pca_clust.index[lescroart_pca_clust.AC == cluster]
+for cluster in lescroart_pca_clust.cell_type.unique():
+    clust_subpop = lescroart_pca_clust.index[lescroart_pca_clust.cell_type == cluster]
     
     lescroart_filter = process_subpop(clust_subpop, lescroart_PSI, lescroart_mrna_counts, mrna_per_event_lescroart, 
                                  lescroart_read_counts, lescroart_coverage_tab['SJ_coverage'], 0.1, 10, 0, cell_min=0.5)
