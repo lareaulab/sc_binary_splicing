@@ -1,3 +1,5 @@
+current_palette = sns.color_palette('muted')
+
 def hyper_test(M, n, N, k):
     
     hpd = hypergeom(M, n, N)
@@ -635,9 +637,11 @@ def summary_curves(pvals, selected_exons, p_limits, beta):
     
 
 
-def summary_plots(pvals, selected_mrna, selected_mrna_only, selected_read, dset_name, 
+def summary_plots(data_out, dset_name, 
                   p_lim=1, p_low = 0.0001, p_steps = 0.0001, linear_p = True, beta=1, plot_line=True):
 
+    pvals, selected_mrna, selected_mrna_only, selected_read = data_out
+    
     if linear_p:
         p_limits = np.arange(p_low, p_lim + p_steps, p_steps)
         
@@ -646,95 +650,130 @@ def summary_plots(pvals, selected_mrna, selected_mrna_only, selected_read, dset_
                #10**np.arange(-np.log10(p_lim), -np.log10(p_low)+p_steps, p_steps)
     
     recall_mrna, precision_mrna, specificity_mrna, f1_score_mrna, hrs_mrna, LRplus_mrna, LRminus_mrna, DOR_mrna, ACC_mrna, BA_mrna = summary_curves(pvals, selected_mrna, p_limits, beta)
-#     recall_mrna_only, precision_mrna_only, specificity_mrna_only, f1_score_mrna_only = summary_curves(pvals, selected_mrna_only, 
-#                                                                                                       p_limits, beta)
+    recall_mrna_only, precision_mrna_only, specificity_mrna_only, f1_score_mrna_only, hrs_mrna_only, LRplus_mrna_only, LRminus_mrna_only, DOR_mrna_only, ACC_mrna_only, BA_mrna_only = summary_curves(pvals, selected_mrna_only, p_limits, beta)
     recall_read, precision_read, specificity_read, f1_score_read, hrs_read, LRplus_read, LRminus_read, DOR_read, ACC_read, BA_read = summary_curves(pvals, selected_read, p_limits, beta)
     
-    '''
-    plt.figure()
-    plt.scatter(-np.log10(p_limits), recall_read, c='darkred', label='read filter')
-    plt.scatter(-np.log10(p_limits), recall_mrna_only, c='forestgreen', label='mrna only filter')
-    plt.scatter(-np.log10(p_limits), recall_mrna, c='navy', label='mrna filter')
     
-    plt.title('Recall curves, ' + dset_name)
-    plt.xlabel('-log10 p-value')
-    plt.ylabel('Recall')
-    plt.legend(frameon=False)
-    plt.show()
-    
-    plt.figure()
-    plt.scatter(-np.log10(p_limits), precision_read, c='darkred', label='read filter')
-    plt.scatter(-np.log10(p_limits), precision_mrna_only, c='forestgreen', label='mrna only filter')
-    plt.scatter(-np.log10(p_limits), precision_mrna, c='navy', label='mrna filter')
-    
-    plt.title('Precision curves, ' + dset_name)
-    plt.xlabel('-log10 p-value')
-    plt.ylabel('Precision')
-    plt.legend(frameon=False)
-    plt.show()
-    
-    plt.figure()
-    plt.scatter(-np.log10(p_limits), specificity_read, c='darkred', label='read filter')
-    plt.scatter(-np.log10(p_limits), specificity_mrna_only, c='forestgreen', label='mrna only filter')
-    plt.scatter(-np.log10(p_limits), specificity_mrna, c='navy', label='mrna filter')
-    
-    plt.title('Specificity curves, ' + dset_name)
-    plt.xlabel('-log10 p-value')
-    plt.ylabel('Specificity')
-    plt.legend(frameon=False)
-    plt.show()
-    
-    '''
-    figsize(14,10)
+    figsize(6,4)
     fig = plt.figure()
     ax  = plt.subplot(1,1,1)
-    if plot_line:
     
-        ax.plot(-np.log10(p_limits), f1_score_read, c='darkred', label='read filter', linewidth=5)
-    #     plt.scatter(-np.log10(p_limits), f1_score_mrna_only, c='forestgreen', label='mrna only filter')
-        ax.plot(-np.log10(p_limits), f1_score_mrna, c='navy', label='mrna filter', linewidth=5)
-    
-    else:
-        ax.scatter(-np.log10(p_limits), f1_score_read, c='darkred', label='read filter',s=250, edgecolors='none')
-    #     plt.scatter(-np.log10(p_limits), f1_score_mrna_only, c='forestgreen', label='mrna only filter')
-        ax.scatter(-np.log10(p_limits), f1_score_mrna, c='navy', label='mrna filter', s=250, edgecolors='none')
-    
-        
+    ax.plot(-np.log10(p_limits), recall_read, c='darkred', label='read filter', linewidth = 3)
+#     ax.plot(-np.log10(p_limits), recall_mrna_only, c='forestgreen', label='mrna only filter', linewidth = 3)
+    ax.plot(-np.log10(p_limits), recall_mrna, c='navy', label='mRNA filter', linewidth = 3)
     
     ax.spines["right"].set_visible(False)
     ax.spines["top"].set_visible(False)
-    ax.tick_params(labelsize=42, length=5)
-    plt.title('F'+str(round(beta, 2))+' curves, ' + dset_name, fontsize=42)
-    plt.xlabel('-log10 p-value', fontsize=42)
-    plt.ylabel('F'+str(round(beta, 2))+' score', fontsize=42)
-    plt.legend(frameon=False, fontsize=42)
+    ax.tick_params(labelsize=24, length=5)
+    plt.title('Recall curves, ' + dset_name, fontsize=24)
+    plt.xlabel('-log10 p-value', fontsize=24)
+    plt.ylabel('Recall', fontsize=24)
+    plt.legend(frameon=False, fontsize=24)
+    plt.xticks([1, 2, 3, 4, 5], ['1', '2', '3', '4', '5'])
+    
+    plt.savefig('plots_review/figure3/anova/recall_' + dset_name + '.svg', bbox_inches='tight')
+    plt.savefig('plots_review/figure3/anova/recall_' + dset_name + '.pdf', bbox_inches='tight')
+    plt.savefig('plots_review/figure3/anova/recall_' + dset_name + '.png', dpi=300, bbox_inches='tight')
+    
     
     plt.show()
     
     
-    figsize(14,10)
+#     figsize(14,10)
     fig = plt.figure()
     ax  = plt.subplot(1,1,1)
-    if plot_line:
     
-        ax.plot(-np.log10(p_limits), hrs_read, c='darkred', label='read filter', linewidth=5)
-    #     plt.scatter(-np.log10(p_limits), f1_score_mrna_only, c='forestgreen', label='mrna only filter')
-        ax.plot(-np.log10(p_limits), hrs_mrna, c='navy', label='mrna filter', linewidth=5)
-    
-    else:
-        ax.scatter(-np.log10(p_limits), hrs_read, c='darkred', label='read filter',s=250, edgecolors='none')
-    #     plt.scatter(-np.log10(p_limits), f1_score_mrna_only, c='forestgreen', label='mrna only filter')
-        ax.scatter(-np.log10(p_limits), hrs_mrna, c='navy', label='mrna filter', s=250, edgecolors='none')
-    
-        
+    ax.plot(-np.log10(p_limits), precision_read, c='darkred', label='read filter', linewidth = 3)
+#     ax.plot(-np.log10(p_limits), precision_mrna_only, c='forestgreen', label='mrna only filter', linewidth=3)
+    ax.plot(-np.log10(p_limits), precision_mrna, c='navy', label='mRNA filter', linewidth=3)
     
     ax.spines["right"].set_visible(False)
     ax.spines["top"].set_visible(False)
-    ax.tick_params(labelsize=42, length=5)
-    plt.title('Sensitivity/specificity, ' + dset_name, fontsize=42)
-    plt.xlabel('-log10 p-value', fontsize=42)
-    plt.ylabel('Harmonic mean', fontsize=42)
-    plt.legend(frameon=False, fontsize=42)
+    ax.tick_params(labelsize=24, length=5)
+    plt.title('Precision curves, ' + dset_name, fontsize=24)
+    plt.xlabel('-log10 p-value', fontsize=24)
+    plt.ylabel('Precision', fontsize=24)
+    plt.legend(frameon=False, fontsize=24)
+    plt.xticks([1, 2, 3, 4, 5], ['1', '2', '3', '4', '5'])
+    
+    plt.savefig('plots_review/figure3/anova/precision_' + dset_name + '.svg', bbox_inches='tight')
+    plt.savefig('plots_review/figure3/anova/precision_' + dset_name + '.pdf', bbox_inches='tight')
+    plt.savefig('plots_review/figure3/anova/precision_' + dset_name + '.png', dpi=300, bbox_inches='tight')
+    
+    plt.show()
+    
+#     figsize(14,10)
+    fig = plt.figure()
+    ax  = plt.subplot(1,1,1)
+    
+    ax.plot(-np.log10(p_limits), specificity_read, c='darkred', label='read filter', linewidth=3)
+#     ax.plot(-np.log10(p_limits), specificity_mrna_only, c='forestgreen', label='mrna only filter', linewidth=3)
+    ax.plot(-np.log10(p_limits), specificity_mrna, c='navy', label='mRNA filter', linewidth=3)
+    
+    ax.spines["right"].set_visible(False)
+    ax.spines["top"].set_visible(False)
+    ax.tick_params(labelsize=24, length=5)
+    plt.title('Specificity curves, ' + dset_name, fontsize=24)
+    plt.xlabel('-log10 p-value', fontsize=24)
+    plt.ylabel('Specificity', fontsize=24)
+    plt.legend(frameon=False, fontsize=24)
+    plt.xticks([1, 2, 3, 4, 5], ['1', '2', '3', '4', '5'])
+    
+    plt.savefig('plots_review/figure3/anova/specificity_' + dset_name + '.svg', bbox_inches='tight')
+    plt.savefig('plots_review/figure3/anova/specificity_' + dset_name + '.pdf', bbox_inches='tight')
+    plt.savefig('plots_review/figure3/anova/specificity_' + dset_name + '.png', dpi=300, bbox_inches='tight')
+    
+    plt.show()
+    
+    
+#     figsize(14,10)
+    fig = plt.figure()
+    ax  = plt.subplot(1,1,1)
+    
+    ax.plot(-np.log10(p_limits), f1_score_read, c='darkred', label='read filter', linewidth=3)
+#     ax.plot(-np.log10(p_limits), f1_score_mrna_only, c='forestgreen', label='mrna only filter', linewidth=3)
+    ax.plot(-np.log10(p_limits), f1_score_mrna, c='navy', label='mRNA filter', linewidth=3)
+
+
+    
+    ax.spines["right"].set_visible(False)
+    ax.spines["top"].set_visible(False)
+    ax.tick_params(labelsize=24, length=5)
+    plt.title('F'+str(round(beta, 2))+' curves, ' + dset_name, fontsize=24)
+    plt.xlabel('-log10 p-value', fontsize=24)
+    plt.ylabel('F'+str(round(beta, 2))+' score', fontsize=24)
+    plt.legend(frameon=False, fontsize=24)
+    plt.xticks([1, 2, 3, 4, 5], ['1', '2', '3', '4', '5'])
+    
+    plt.savefig('plots_review/figure3/anova/f1_score_' + dset_name + '.svg', bbox_inches='tight')
+    plt.savefig('plots_review/figure3/anova/f1_score_' + dset_name + '.pdf', bbox_inches='tight')
+    plt.savefig('plots_review/figure3/anova/f1_score_' + dset_name + '.png', dpi=300, bbox_inches='tight')
+    
+    plt.show()
+    
+    
+#     figsize(14,10)
+    fig = plt.figure()
+    ax  = plt.subplot(1,1,1)
+    
+    ax.plot(-np.log10(p_limits), hrs_read, c='darkred', label='read filter', linewidth=3)
+#     ax.plot(-np.log10(p_limits), hrs_mrna_only, c='forestgreen', label='mrna only filter', linewidth=3)
+    ax.plot(-np.log10(p_limits), hrs_mrna, c='navy', label='mRNA filter', linewidth=3)
+    
+   
+    
+    ax.spines["right"].set_visible(False)
+    ax.spines["top"].set_visible(False)
+    ax.tick_params(labelsize=24, length=5)
+    plt.title('Sensitivity/specificity, ' + dset_name, fontsize=24)
+    plt.xlabel('-log10 p-value', fontsize=24)
+    plt.ylabel('Harmonic mean', fontsize=24)
+    plt.legend(frameon=False, fontsize=24)
+    plt.xticks([1, 2, 3, 4, 5], ['1', '2', '3', '4', '5'])
+    
+    plt.savefig('plots_review/figure3/anova/hrs_' + dset_name + '.svg', bbox_inches='tight')
+    plt.savefig('plots_review/figure3/anova/hrs_' + dset_name + '.pdf', bbox_inches='tight')
+    plt.savefig('plots_review/figure3/anova/hrs_' + dset_name + '.png', dpi=300, bbox_inches='tight')
     
     plt.show()
     
@@ -742,88 +781,76 @@ def summary_plots(pvals, selected_mrna, selected_mrna_only, selected_read, dset_
     
     ##################
     
-    figsize(14,10)
+#     figsize(14,10)
     fig = plt.figure()
     ax  = plt.subplot(1,1,1)
-    if plot_line:
     
-        ax.plot(-np.log10(p_limits), LRplus_read, c='darkred', label='read filter', linewidth=5)
-    #     plt.scatter(-np.log10(p_limits), f1_score_mrna_only, c='forestgreen', label='mrna only filter')
-        ax.plot(-np.log10(p_limits), LRplus_mrna, c='navy', label='mrna filter', linewidth=5)
-    
+    ax.plot(-np.log10(p_limits), LRplus_read, c='darkred', label='read filter', linewidth=3)
+#     ax.plot(-np.log10(p_limits), LRplus_mrna_only, c='forestgreen', label='mrna only filter', linewidth=3)
+    ax.plot(-np.log10(p_limits), LRplus_mrna, c='navy', label='mRNA filter', linewidth=3)
+
     ax.spines["right"].set_visible(False)
     ax.spines["top"].set_visible(False)
-    ax.tick_params(labelsize=42, length=5)
-    plt.title('Positive likelihood ratio, ' + dset_name, fontsize=42)
-    plt.xlabel('-log10 p-value', fontsize=42)
-    plt.ylabel('LR+', fontsize=42)
-    plt.legend(frameon=False, fontsize=42)
+    ax.tick_params(labelsize=24, length=5)
+    plt.title('Positive likelihood ratio, ' + dset_name, fontsize=24)
+    plt.xlabel('-log10 p-value', fontsize=24)
+    plt.ylabel('LR+', fontsize=24)
+    plt.legend(frameon=False, fontsize=24)
+    plt.xticks([1, 2, 3, 4, 5], ['1', '2', '3', '4', '5'])
+    
+    plt.savefig('plots_review/figure3/anova/LRplus_' + dset_name + '.svg', bbox_inches='tight')
+    plt.savefig('plots_review/figure3/anova/LRplus_' + dset_name + '.pdf', bbox_inches='tight')
+    plt.savefig('plots_review/figure3/anova/LRplus_' + dset_name + '.png', dpi=300, bbox_inches='tight')
     
     plt.show()
 
     
     
-    figsize(14,10)
+#     figsize(14,10)
     fig = plt.figure()
     ax  = plt.subplot(1,1,1)
-    if plot_line:
     
-        ax.plot(-np.log10(p_limits), LRminus_read, c='darkred', label='read filter', linewidth=5)
-    #     plt.scatter(-np.log10(p_limits), f1_score_mrna_only, c='forestgreen', label='mrna only filter')
-        ax.plot(-np.log10(p_limits), LRminus_mrna, c='navy', label='mrna filter', linewidth=5)
+    ax.plot(-np.log10(p_limits), LRminus_read, c='darkred', label='read filter', linewidth=3)
+#     ax.plot(-np.log10(p_limits), LRminus_mrna_only, c='forestgreen', label='mrna only filter', linewidth=3)
+    ax.plot(-np.log10(p_limits), LRminus_mrna, c='navy', label='mRNA filter', linewidth=3)
     
     ax.spines["right"].set_visible(False)
     ax.spines["top"].set_visible(False)
-    ax.tick_params(labelsize=42, length=5)
-    plt.title('Negative likelihood ratio, ' + dset_name, fontsize=42)
-    plt.xlabel('-log10 p-value', fontsize=42)
-    plt.ylabel('LR-', fontsize=42)
-    plt.legend(frameon=False, fontsize=42)
+    ax.tick_params(labelsize=24, length=5)
+    plt.title('Negative likelihood ratio, ' + dset_name, fontsize=24)
+    plt.xlabel('-log10 p-value', fontsize=24)
+    plt.ylabel('LR-', fontsize=24)
+    plt.legend(frameon=False, fontsize=24)
+    plt.xticks([1, 2, 3, 4, 5], ['1', '2', '3', '4', '5'])
+    
+    plt.savefig('plots_review/figure3/anova/LRminus_' + dset_name + '.svg', bbox_inches='tight')
+    plt.savefig('plots_review/figure3/anova/LRminus_' + dset_name + '.pdf', bbox_inches='tight')
+    plt.savefig('plots_review/figure3/anova/LRminus_' + dset_name + '.png', dpi=300, bbox_inches='tight')
     
     plt.show()
     
     
     
-    figsize(14,10)
+#     figsize(14,10)
     fig = plt.figure()
     ax  = plt.subplot(1,1,1)
-    if plot_line:
     
-        ax.plot(-np.log10(p_limits), DOR_read, c='darkred', label='read filter', linewidth=5)
-    #     plt.scatter(-np.log10(p_limits), f1_score_mrna_only, c='forestgreen', label='mrna only filter')
-        ax.plot(-np.log10(p_limits), DOR_mrna, c='navy', label='mrna filter', linewidth=5)
+    ax.plot(-np.log10(p_limits), DOR_read, c='darkred', label='read filter', linewidth=3)
+#     ax.plot(-np.log10(p_limits), DOR_mrna_only, c='forestgreen', label='mrna only filter', linewidth=3)
+    ax.plot(-np.log10(p_limits), DOR_mrna, c='navy', label='mRNA filter', linewidth=3)
     
     ax.spines["right"].set_visible(False)
     ax.spines["top"].set_visible(False)
-    ax.tick_params(labelsize=42, length=5)
-    plt.title('Diagnostic odds ratio, ' + dset_name, fontsize=42)
-    plt.xlabel('-log10 p-value', fontsize=42)
-    plt.ylabel('DOR', fontsize=42)
-    plt.legend(frameon=False, fontsize=42)
+    ax.tick_params(labelsize=24, length=5)
+    plt.title('Diagnostic odds ratio, ' + dset_name, fontsize=24)
+    plt.xlabel('-log10 p-value', fontsize=24)
+    plt.ylabel('DOR', fontsize=24)
+    plt.legend(frameon=False, fontsize=24)
+    plt.xticks([1, 2, 3, 4, 5], ['1', '2', '3', '4', '5'])
     
-    plt.show()
-    
-    
-    
-    
-    
-    
-    figsize(14,10)
-    fig = plt.figure()
-    ax  = plt.subplot(1,1,1)
-    if plot_line:
-    
-        ax.plot(-np.log10(p_limits), ACC_read, c='darkred', label='read filter', linewidth=5)
-    #     plt.scatter(-np.log10(p_limits), f1_score_mrna_only, c='forestgreen', label='mrna only filter')
-        ax.plot(-np.log10(p_limits), ACC_mrna, c='navy', label='mrna filter', linewidth=5)
-    
-    ax.spines["right"].set_visible(False)
-    ax.spines["top"].set_visible(False)
-    ax.tick_params(labelsize=42, length=5)
-    plt.title('Accuracy, ' + dset_name, fontsize=42)
-    plt.xlabel('-log10 p-value', fontsize=42)
-    plt.ylabel('ACC', fontsize=42)
-    plt.legend(frameon=False, fontsize=42)
+    plt.savefig('plots_review/figure3/anova/DOR_' + dset_name + '.svg', bbox_inches='tight')
+    plt.savefig('plots_review/figure3/anova/DOR_' + dset_name + '.pdf', bbox_inches='tight')
+    plt.savefig('plots_review/figure3/anova/DOR_' + dset_name + '.png', dpi=300, bbox_inches='tight')
     
     plt.show()
     
@@ -831,22 +858,54 @@ def summary_plots(pvals, selected_mrna, selected_mrna_only, selected_read, dset_
     
     
     
-    figsize(14,10)
+    
+#     figsize(14,10)
     fig = plt.figure()
     ax  = plt.subplot(1,1,1)
-    if plot_line:
     
-        ax.plot(-np.log10(p_limits), BA_read, c='darkred', label='read filter', linewidth=5)
-    #     plt.scatter(-np.log10(p_limits), f1_score_mrna_only, c='forestgreen', label='mrna only filter')
-        ax.plot(-np.log10(p_limits), BA_mrna, c='navy', label='mrna filter', linewidth=5)
+    ax.plot(-np.log10(p_limits), ACC_read, c='darkred', label='read filter', linewidth=3)
+#     ax.plot(-np.log10(p_limits), ACC_mrna_only, c='forestgreen', label='mrna only filter', linewidth=3)
+    ax.plot(-np.log10(p_limits), ACC_mrna, c='navy', label='mRNA filter', linewidth=3)
     
     ax.spines["right"].set_visible(False)
     ax.spines["top"].set_visible(False)
-    ax.tick_params(labelsize=42, length=5)
-    plt.title('Balanced Accuracy, ' + dset_name, fontsize=42)
-    plt.xlabel('-log10 p-value', fontsize=42)
-    plt.ylabel('BA', fontsize=42)
-    plt.legend(frameon=False, fontsize=42)
+    ax.tick_params(labelsize=24, length=5)
+    plt.title('Accuracy, ' + dset_name, fontsize=24)
+    plt.xlabel('-log10 p-value', fontsize=24)
+    plt.ylabel('ACC', fontsize=24)
+    plt.legend(frameon=False, fontsize=24)
+    plt.xticks([1, 2, 3, 4, 5], ['1', '2', '3', '4', '5'])
+    
+    plt.savefig('plots_review/figure3/anova/accuracy_' + dset_name + '.svg', bbox_inches='tight')
+    plt.savefig('plots_review/figure3/anova/accuracy_' + dset_name + '.pdf', bbox_inches='tight')
+    plt.savefig('plots_review/figure3/anova/accuracy_' + dset_name + '.png', dpi=300, bbox_inches='tight')
+    
+    plt.show()
+    
+    
+    
+    
+    
+#     figsize(14,10)
+    fig = plt.figure()
+    ax  = plt.subplot(1,1,1)
+    
+    ax.plot(-np.log10(p_limits), BA_read, c='darkred', label='read filter', linewidth=3)
+#     ax.plot(-np.log10(p_limits), BA_mrna_only, c='forestgreen', label='mrna only filter', linewidth=3)
+    ax.plot(-np.log10(p_limits), BA_mrna, c='navy', label='mRNA filter', linewidth=3)
+    
+    ax.spines["right"].set_visible(False)
+    ax.spines["top"].set_visible(False)
+    ax.tick_params(labelsize=24, length=5)
+    plt.title('Balanced Accuracy, ' + dset_name, fontsize=24)
+    plt.xlabel('-log10 p-value', fontsize=24)
+    plt.ylabel('BA', fontsize=24)
+    plt.legend(frameon=False, fontsize=24)
+    plt.xticks([1, 2, 3, 4, 5], ['1', '2', '3', '4', '5'])
+    
+    plt.savefig('plots_review/figure3/anova/balanced_accuracy_' + dset_name + '.svg', bbox_inches='tight')
+    plt.savefig('plots_review/figure3/anova/balanced_accuracy_' + dset_name + '.pdf', bbox_inches='tight')
+    plt.savefig('plots_review/figure3/anova/balanced_accuracy_' + dset_name + '.png', dpi=300, bbox_inches='tight')
     
     plt.show()
 

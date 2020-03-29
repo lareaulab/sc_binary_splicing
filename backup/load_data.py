@@ -321,3 +321,107 @@ from scipy.stats import kruskal
 
 from scipy.stats import combine_pvalues
 from scipy.stats import probplot
+
+
+###############
+
+# For the sake of quantification, filter exons between 0.05 and 0.95
+
+###################
+# Chen
+ac = AgglomerativeClustering(n_clusters=5)
+ac_clusters = ac.fit_predict(chen_pca[['PC1', 'PC2']])
+
+# figsize(6,4)
+# plt.scatter(chen_pca.PC1, chen_pca.PC2, c=ac_clusters)
+# plt.show()
+
+chen_pca_clust = chen_pca.copy()
+chen_pca_clust['AC'] = ac_clusters
+
+chen_clust_filter_05 = []
+for cluster in chen_pca_clust.groupby('AC')['pseudotime'].mean().sort_values().index:
+    clust_subpop = chen_pca_clust.index[chen_pca_clust.AC == cluster]
+    
+    chen_filter = process_subpop(clust_subpop, chen_PSI, chen_mrna_counts, mrna_per_event_chen, 
+                                 chen_read_counts, chen_coverage_tab['SJ_coverage'], 0.05, 10, 0, cell_min=0.5)
+    
+    chen_clust_filter_05.append(chen_filter)
+    
+###################
+# Song
+ac = AgglomerativeClustering(n_clusters=3)
+ac_clusters = ac.fit_predict(song_pca[['PC1', 'PC2']])
+
+# figsize(6,4)
+# plt.scatter(song_pca.PC1, song_pca.PC2, c=ac_clusters)
+# plt.show()
+
+song_pca_clust = song_pca.copy()
+song_pca_clust['AC'] = ac_clusters
+
+song_clust_filter_05 = []
+for cluster in song_pca_clust.groupby('AC')['pseudotime'].mean().sort_values().index:
+    clust_subpop = song_pca_clust.index[song_pca_clust.AC == cluster]
+    
+    song_filter = process_subpop(clust_subpop, song_PSI, song_mrna_counts, mrna_per_event_song, 
+                                 song_read_counts, song_coverage_tab['SJ_coverage'], 0.05, 10, 0, cell_min=0.5)
+    
+    song_clust_filter_05.append(song_filter)
+    
+    
+###################
+# Lescroart
+ac = AgglomerativeClustering(n_clusters=3)
+ac_clusters = ac.fit_predict(lescroart_pca[['PC1', 'PC2']])
+
+# figsize(6,4)
+# plt.scatter(lescroart_pca.PC1, lescroart_pca.PC2, c=ac_clusters)
+# plt.show()
+
+lescroart_clust_filter_05 = []
+for cluster in lescroart_pca_clust.cell_type.unique():
+    clust_subpop = lescroart_pca_clust.index[lescroart_pca_clust.cell_type == cluster]
+    
+    lescroart_filter = process_subpop(clust_subpop, lescroart_PSI, lescroart_mrna_counts, mrna_per_event_lescroart, 
+                                 lescroart_read_counts, lescroart_coverage_tab['SJ_coverage'], 0.05, 10, 0, cell_min=0.5)
+    
+    lescroart_clust_filter_05.append(lescroart_filter)
+    
+    
+    
+###################
+# Trapnell
+ac = AgglomerativeClustering(n_clusters=4)
+ac_clusters = ac.fit_predict(trapnell_pca[['PC1', 'PC2']])
+
+# figsize(6,4)
+# plt.scatter(trapnell_pca.PC1, trapnell_pca.PC2, c=ac_clusters)
+# plt.show()
+
+trapnell_pca_clust = trapnell_pca.copy()
+trapnell_pca_clust['AC'] = ac_clusters
+
+trapnell_clust_filter_05 = []
+for cluster in trapnell_pca_clust.groupby('AC')['pseudotime'].mean().sort_values().index:
+    clust_subpop = trapnell_pca_clust.index[trapnell_pca_clust.AC == cluster]
+    
+    trapnell_filter = process_subpop(clust_subpop, trapnell_PSI, trapnell_mrna_counts, mrna_per_event_trapnell, 
+                                 trapnell_read_counts, trapnell_coverage_tab['SJ_coverage'], 0.05, 10, 0, cell_min=0.5)
+    
+    trapnell_clust_filter_05.append(trapnell_filter)
+
+    
+
+    
+    
+das_sra = pd.read_csv('/mnt/c/Users/ferna/Desktop/SingleCell/data/das/SraRunTable.txt', sep='\t', index_col = 6)
+das_sra = das_sra.loc[das_PSI.columns]
+das_clust_filter_05 = []
+for cluster in sorted(das_sra.age.unique()):
+    clust_subpop = das_sra.index[das_sra.age == cluster]
+    
+    das_filter = process_subpop(clust_subpop, das_PSI, das_mrna_counts, mrna_per_event_das, 
+                                 das_read_counts, das_coverage_tab['SJ_coverage'], 0.1, 10, 0, cell_min=0.5)
+    
+    das_clust_filter_05.append(das_filter)
