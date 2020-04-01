@@ -37,6 +37,9 @@ for (i in 1:1500) {
 
 mrna_matrix <- rbind(I_matrix, E_matrix)
 
+observed_reads_2 <- True2ObservedCounts(true_counts=mrna_matrix, meta_cell=mrna[[3]], protocol="nonUMI", alpha_mean=0.25, 
+                                        alpha_sd=0.002, gene_len=gene_len, depth_mean=1e5, depth_sd=3e4, lenslope=0.01)
+              
 observed_reads_1 <- True2ObservedCounts(true_counts=mrna_matrix, meta_cell=mrna[[3]], protocol="nonUMI", alpha_mean=0.1, 
                                         alpha_sd=0.002, gene_len=gene_len, depth_mean=1e5, depth_sd=3e4, lenslope=0.01)
 
@@ -51,6 +54,7 @@ observed_reads_01 <- True2ObservedCounts(true_counts=mrna_matrix, meta_cell=mrna
 
 
 write.table(mrna_matrix, 'sim1/unimodal_true.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
+write.table(observed_reads_2[[1]], 'sim1/unimodal_observed_2.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
 write.table(observed_reads_1[[1]], 'sim1/unimodal_observed_1.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
 write.table(observed_reads_05[[1]], 'sim1/unimodal_observed_05.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
 write.table(observed_reads_02[[1]], 'sim1/unimodal_observed_02.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
@@ -80,6 +84,9 @@ for (i in 1:1500) {
 }
 
 mrna_matrix <- rbind(I_matrix, E_matrix)
+              
+observed_reads_2 <- True2ObservedCounts(true_counts=mrna_matrix, meta_cell=mrna[[3]], protocol="nonUMI", alpha_mean=0.2, 
+                                        alpha_sd=0.002, gene_len=gene_len, depth_mean=1e5, depth_sd=3e4, lenslope=0.01)
 
 observed_reads_1 <- True2ObservedCounts(true_counts=mrna_matrix, meta_cell=mrna[[3]], protocol="nonUMI", alpha_mean=0.1, 
                                         alpha_sd=0.002, gene_len=gene_len, depth_mean=1e5, depth_sd=3e4, lenslope=0.01)
@@ -95,6 +102,7 @@ observed_reads_01 <- True2ObservedCounts(true_counts=mrna_matrix, meta_cell=mrna
 
 
 write.table(mrna_matrix, 'sim1/bimodal_true.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
+write.table(observed_reads_2[[1]], 'sim1/bimodal_observed_2.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
 write.table(observed_reads_1[[1]], 'sim1/bimodal_observed_1.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
 write.table(observed_reads_05[[1]], 'sim1/bimodal_observed_05.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
 write.table(observed_reads_02[[1]], 'sim1/bimodal_observed_02.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
