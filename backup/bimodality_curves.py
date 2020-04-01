@@ -229,7 +229,7 @@ def run_AUC_tests(curves_all, read_filtered, mrna_only_filtered, mrna_filtered):
 
 def plot_bimodality_boxplots(curves_all, read_selected, mrna_only_selected, mrna_selected, dset):
 
-    fig = plt.figure(figsize=(12,8))
+    fig = plt.figure(figsize=(9,6))
     ax  = plt.subplot(1,1,1)
 
     data_a = [curves_all[x] for x in curves_all.columns[:-1]]
@@ -267,24 +267,28 @@ def plot_bimodality_boxplots(curves_all, read_selected, mrna_only_selected, mrna
     # set_box_color(bpr, 'lightred')
 
     # draw temporary red and blue lines and use them to create a legend
-    plt.plot([], c=current_palette[4], label='all exons')
-    plt.plot([], c=current_palette[2], label='reads filter')
-    plt.plot([], c=current_palette[1], label='mrna only filter')
-    plt.plot([], c=current_palette[0], label='mrna filter')
-    plt.legend(frameon=False, fontsize=24)
-    ax.tick_params(labelsize=42)
+    
+    ax.tick_params(labelsize=28, length=5)###
     ax.spines["right"].set_visible(False)
     ax.spines["top"].set_visible(False)
     
-    plt.xlabel('Bimodality limit', fontsize=42)
-    plt.ylabel('Percent bimodal cells', fontsize=42)
-    plt.title(dset, fontsize=42)
+    plt.xlabel('Bimodality limit', fontsize=28)
+    plt.ylabel('Percent bimodal cells', fontsize=28)
+    plt.title(dset, fontsize=28)
 
+#     plt.xticks(range(0, len(curves_all.columns[:-1]) * 7, 7), curves_all.columns[:-1])
     plt.xticks(range(0, len(curves_all.columns[:-1]) * 7, 14), curves_all.columns[:-1][::2])
     # plt.xlim(-2, len(ticks)*2)
     plt.tight_layout()
     plt.xlim(-3, len(curves_all.columns[:-1])*7-3)
+    plt.ylim(-0.05, 1.05)
     
+    plt.yticks([0, 0.5, 1], ['0.0', '0.5', '1.0'])
+    
+    
+    ###
+#     plt.tick_params(labelsize=34, length=5)
+    ###
     
     plot_name = '_'.join(dset.split())
     
@@ -294,9 +298,36 @@ def plot_bimodality_boxplots(curves_all, read_selected, mrna_only_selected, mrna
     plt.savefig('plots_review/figure3/bimodality_plots_' + plot_name + '.png', dpi=300, bbox_inches='tight')
     
     
+    
+    figsize(4,3)
+    fig = plt.figure()
+    ax  = plt.subplot(1,1,1)
+
+    plt.plot([], c=current_palette[4], label='all exons', linewidth=5)
+    plt.plot([], c=current_palette[2], label='reads filter', linewidth=5)
+    plt.plot([], c=current_palette[1], label='mRNA only filter', linewidth=5)
+    plt.plot([], c=current_palette[0], label='mRNA filter', linewidth=5)
+    plt.legend(frameon=False, fontsize=28)
+
+    ax.spines["top"].set_visible(False)
+    ax.spines["bottom"].set_visible(False)
+    ax.spines["left"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    plt.setp(ax.get_xticklabels(), visible=False)
+    plt.setp(ax.get_yticklabels(), visible=False)
+    ax.xaxis.set_ticks_position('none') 
+    ax.yaxis.set_ticks_position('none')
+    plt.legend(fontsize=28, frameon=False)
+
+    plt.savefig('plots_review/figure3/bimodality_plots_labels.svg', bbox_inches='tight')
+    plt.savefig('plots_review/figure3/bimodality_plots_labels.pdf', bbox_inches='tight')
+    plt.savefig('plots_review/figure3/bimodality_plots_labels.png', bbox_inches='tight')
+    plt.show()
+    
+    
 def plot_bimodality_difference(curves_all, read_filtered, mrna_only_filtered, mrna_filtered, dset):
 
-    fig = plt.figure(figsize=(12,8))
+    fig = plt.figure(figsize=(9,6))
     ax  = plt.subplot(1,1,1)
 
     # data_a = [curves_all[x] for x in curves_all.columns[:-1]]
@@ -306,9 +337,9 @@ def plot_bimodality_difference(curves_all, read_filtered, mrna_only_filtered, mr
     # ticks = ['A', 'B', 'C']
 
 
-    bpr = ax.boxplot(data_a, positions=np.array(range(len(data_b)))*7.0-1.5, sym='', widths=0.9, patch_artist=True)
-    bpmo = ax.boxplot(data_b, positions=np.array(range(len(data_c)))*7.0, sym='', widths=0.9, patch_artist=True)
-    bpm = ax.boxplot(data_c, positions=np.array(range(len(data_d)))*7.0+1.5, sym='', widths=0.9, patch_artist=True)
+    bpr = ax.boxplot(data_a, positions=np.array(range(len(data_a)))*7.0-1.5, sym='', widths=0.9, patch_artist=True)
+    bpmo = ax.boxplot(data_b, positions=np.array(range(len(data_b)))*7.0, sym='', widths=0.9, patch_artist=True)
+    bpm = ax.boxplot(data_c, positions=np.array(range(len(data_c)))*7.0+1.5, sym='', widths=0.9, patch_artist=True)
 
 
     # [x.set_facecolor(current_palette[0]) for x in bpl['boxes']]
@@ -327,23 +358,22 @@ def plot_bimodality_difference(curves_all, read_filtered, mrna_only_filtered, mr
 
     # draw temporary red and blue lines and use them to create a legend
 #     plt.plot([], c=current_palette[4], label='all exons')
-    plt.plot([], c=current_palette[2], label='reads filter')
-    plt.plot([], c=current_palette[1], label='mrna only filter')
-    plt.plot([], c=current_palette[0], label='mrna filter')
-    plt.legend(frameon=False, fontsize=24)
-    ax.tick_params(labelsize=42)
+    
+#     plt.legend(frameon=False, fontsize=24)
+    ax.tick_params(labelsize=28, length=5)##
     ax.spines["right"].set_visible(False)
     ax.spines["top"].set_visible(False)
     
-    plt.xlabel('Bimodality limit', fontsize=42)
-    plt.ylabel('Bimodality change', fontsize=42)
-    plt.title(dset, fontsize=42)
+    plt.xlabel('Bimodality limit', fontsize=28)
+    plt.ylabel('Bimodality change', fontsize=28)
+    plt.title(dset, fontsize=28)
 
     plt.xticks(range(0, len(curves_all.columns[:-1]) * 7, 14), curves_all.columns[:-1][::2])
+#     plt.xticks(range(0, len(curves_all.columns[:-1]) * 7, 7), curves_all.columns[:-1])
     
     plt.tight_layout()
     plt.xlim(-3, len(curves_all.columns[:-1])*7-3)
-    
+#     plt.ylim(-0.05, 1.05)
     
     plot_name = '_'.join(dset.split())
     
@@ -351,3 +381,28 @@ def plot_bimodality_difference(curves_all, read_filtered, mrna_only_filtered, mr
     plt.savefig('plots_review/figure3/bimodality_reduction_' + plot_name + '.svg', bbox_inches='tight')
     plt.savefig('plots_review/figure3/bimodality_reduction_' + plot_name + '.pdf', bbox_inches='tight')
     plt.savefig('plots_review/figure3/bimodality_reduction_' + plot_name + '.png', dpi=300, bbox_inches='tight')
+    
+    
+    figsize(4,3)
+    fig = plt.figure()
+    ax  = plt.subplot(1,1,1)
+
+    plt.plot([], c=current_palette[2], label='reads filter', linewidth=5)
+    plt.plot([], c=current_palette[1], label='mRNA only filter', linewidth=5)
+    plt.plot([], c=current_palette[0], label='mRNA filter', linewidth=5)
+    plt.legend(frameon=False, fontsize=28)
+
+    ax.spines["top"].set_visible(False)
+    ax.spines["bottom"].set_visible(False)
+    ax.spines["left"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    plt.setp(ax.get_xticklabels(), visible=False)
+    plt.setp(ax.get_yticklabels(), visible=False)
+    ax.xaxis.set_ticks_position('none') 
+    ax.yaxis.set_ticks_position('none')
+    plt.legend(fontsize=28, frameon=False)
+
+    plt.savefig('plots_review/figure3/bimodality_reduction_labels.svg', bbox_inches='tight')
+    plt.savefig('plots_review/figure3/bimodality_reduction_labels.pdf', bbox_inches='tight')
+    plt.savefig('plots_review/figure3/bimodality_reduction_labels.png', bbox_inches='tight')
+    plt.show()
