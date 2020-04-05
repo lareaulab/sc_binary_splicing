@@ -4,6 +4,7 @@ import subprocess as sp
 import os
 from scipy.stats import gaussian_kde
 from numpy import random as r
+import matplotlib.pyplot as plt
 
 
 def get_psi_table(SJ_table_name, minJR=5, minCell=20, drop_duplicates = False):
@@ -173,12 +174,19 @@ def normalize_equation(cell, moda):
     return n/interval
     
 
-def get_transcripts_per_cell(cell, plot_hist, correct_high, bw_method):
+def get_transcripts_per_cell(cell, plot_hist, correct_high, bw_method, adjust_high):
     z = gaussian_kde(np.log10(cell), bw_method)
     
     moda = np.arange(-1, 10, 0.1)[z.pdf(np.arange(-1, 10, 0.1)).argmax()]
     
     molecules_in_cell = normalize_equation(cell, moda)
+    
+    
+    if (molecules_in_cell > 1000000) and adjust_high:
+        moda = np.arange(1, 10, 0.1)[z.pdf(np.arange(1, 10, 0.1)).argmax()]
+    
+        molecules_in_cell = normalize_equation(cell, moda)
+            
     
     if correct_high and (molecules_in_cell > 1000000):
         
@@ -196,9 +204,9 @@ def get_transcripts_per_cell(cell, plot_hist, correct_high, bw_method):
     return molecules_in_cell
         
 
-def transform_cell(cell, plot_hist, correct_high, bw_method):
+def transform_cell(cell, plot_hist, correct_high, bw_method, adjust_high):
     cell_filtered = cell.loc[cell > 0.1]
-    molecules_in_cell = get_transcripts_per_cell(cell_filtered, plot_hist, correct_high, bw_method)
+    molecules_in_cell = get_transcripts_per_cell(cell_filtered, plot_hist, correct_high, bw_method, adjust_high)
     cell_remove_zeros = cell * (cell > 0.1)
     normalize_lysate = molecules_in_cell / 1000000
     cell_transcript_counts = cell_remove_zeros * normalize_lysate
@@ -206,14 +214,14 @@ def transform_cell(cell, plot_hist, correct_high, bw_method):
     return cell_transcript_counts#, molecules_in_cell
 
 
-def transform_tpm_to_counts(tpm_dataset, plot_hist = True, correct_high = True, bw_method='scott'):
+def transform_tpm_to_counts(tpm_dataset, plot_hist = True, correct_high = True, bw_method='scott', adjust_high = False):
     mrna_counts = pd.DataFrame()
     mrna_counts_per_cell = []
     cells = tpm_dataset.columns
     tpm_dataset_filtered = tpm_dataset.loc[tpm_dataset.max(axis=1) > 0.1]
     
     for cell in cells:
-        cell_mrna = transform_cell(tpm_dataset_filtered[cell], plot_hist, correct_high, bw_method)
+        cell_mrna = transform_cell(tpm_dataset_filtered[cell], plot_hist, correct_high, bw_method, adjust_high)
         if all([x == 0 for x in cell_mrna]):
             print('Skipping cell')
             continue
@@ -258,6 +266,12 @@ def get_rpm_dataset(PSI_table, read_counts, mrna_counts, exon_list):
     return sr
 
 
+# def get_int_events(PSI_table, mrna_counts, min_unimodal = 0.05):
+#     int_exons = PSI_table.index[(PSI_table.mean(axis=1) >= min_unimodal) & (PSI_table.mean(axis=1) <= (1- min_unimodal))]
+#     int_exons = [x for x in int_exons if x.split('_')[0] in mrna_counts.index]
+#     int_genes = sorted(set([x.split('_')[0] for x in int_exons]))
+#     return int_genes, int_exons
+
 def get_int_events(PSI_table, mrna_counts, min_unimodal = 0.05):
     int_exons = PSI_table.index[(PSI_table.mean(axis=1) >= min_unimodal) & (PSI_table.mean(axis=1) <= (1- min_unimodal))]
     int_exons = [x for x in int_exons if x.split('_')[0] in mrna_counts.index]
@@ -289,4 +303,204 @@ def get_dataset_averages(psi_table, read_counts, mrna_counts, exon_list, stat = 
         
     return reads_list, mrna_list, binary_list, psi_list
     
+    
+def filter_psi(psi_tab, int_exons, mrna_tab, cj, reads_tab, mrna_min, reads_min=0, cell_min=0.5, filter_cj = True):
+    
+    '''
+    Filter observations and select exons.
+    '''
+    
+    int_exons = [x for x in int_exons if x in mrna_tab.index]
+    reads_tab = reads_tab.loc[int_exons, mrna_tab.columns]
+    mrna_tab = mrna_tab.loc[int_exons, mrna_tab.columns]
+    cj = cj.loc[mrna_tab.columns]
+    psi_tab = psi_tab.loc[int_exons, mrna_tab.columns]
+    
+    if filter_cj:
+        cj_factor = 1
+    else:
+        cj_factor = 0
+
+    cj_filter = (reads_tab.loc[int_exons, cj.index] >= (mrna_min*cj_factor*cj*(1+psi_tab.loc[int_exons, cj.index])))
+#     mrna_filter = (mrna_tab.loc[int_exons, cj.index] >= mrna_min) & (reads_tab.loc[int_exons, cj.index] >= reads_min) #&
+    ##### reads_min*(1+psi_tab.loc[int_exons, cj.index])
+    mrna_filter = (mrna_tab.loc[int_exons, cj.index] >= mrna_min) & (reads_tab.loc[int_exons, cj.index] >= (reads_min*(1+psi_tab.loc[int_exons, cj.index]))) #&
+    quality = ((mrna_filter & cj_filter).mean(axis=1) >= cell_min)
+    good_exons = quality.loc[quality].index
+
+    filter_tab = (mrna_filter & cj_filter).loc[good_exons]
+    psi_tab_mrna = psi_tab.loc[good_exons]
+
+    PSI_filtered = psi_tab_mrna
+    PSI_filtered = psi_tab_mrna.mask(~filter_tab)
+    PSI_filtered = PSI_filtered.dropna(how='all') # might be unnecessary
+    PSI_mrna_filtered = PSI_filtered.loc[PSI_filtered.isnull().mean(axis=1) < (1-cell_min)] # might be unnecessary
+    total_exons = len(PSI_mrna_filtered.index)
+    
+    
+    mrna_filtered = mrna_tab.loc[PSI_filtered.index].mask(~filter_tab)
+    reads_filtered = reads_tab.loc[PSI_filtered.index].mask(~filter_tab)
+
+    return PSI_filtered, PSI_mrna_filtered, good_exons, mrna_filtered, reads_filtered
+
+
+def hartigan_test(x_list):
+    ht_input = 'c(' + ','.join([str(x) for x in x_list]) + ')'
+    ht_test_r = dt.dip_test(x=robjects.r(ht_input))
+    ht_test_py = rpyn.rpy2py(ht_test_r)
+    ht_statistic = ht_test_py[0][0]
+    ht_pval = ht_test_py[1][0]
+    return ht_statistic, ht_pval
+
+
+
+def filtered_bimodal(subset_list, cell_type, pca_tab, mrna_per_event, 
+                     read_counts, quantile = 0.25, psi_lim = 0.25):
+    i = 0
+    j = 0
+    for subset in subset_list:
+
+        for event in subset[0].index:
+            
+            
+
+            token = subset[0].loc[event].dropna().quantile(quantile) <= psi_lim
+            token = token and subset[0].loc[event].dropna().quantile(1-quantile) >= (1 - psi_lim)
+            if token:
+
+                plt.hist(subset[0].loc[event].dropna(), range=[0,1], density=True)
+                plt.title(event + ', ' + cell_type[j], fontsize=24)
+                plt.xlabel(r'$\Psi$', fontsize=24)
+                plt.ylabel('frequency', fontsize=24)
+                plt.show()
+
+                good_cells = subset[0].loc[event].dropna().index
+                all_cells = subset[0].columns
+                
+                if 'sex' in pca_tab.columns:
+                
+                    good_male = [x for x in good_cells if x in pca_tab.loc[pca_tab.sex == 'male'].index]
+                    good_female = [x for x in good_cells if x not in good_male]
+
+                    plt.hist(subset[0].loc[event, good_male].dropna(), range=[0,1], density=True, 
+                             color='skyblue', alpha=0.5, label='male')
+                    plt.hist(subset[0].loc[event, good_female].dropna(), range=[0,1], density=True, 
+                             color='forestgreen', alpha=0.5, label='female')
+                    plt.title(event + ', ' + cell_type[j], fontsize=24)
+                    plt.xlabel(r'$\Psi$', fontsize=24)
+                    plt.ylabel('frequency', fontsize=24)
+                    plt.legend(frameon=False)
+                    plt.show()
+
+
+                plt.figure()
+                plt.scatter(pca_tab.loc[all_cells, 'PC1'], pca_tab.loc[all_cells, 'PC2'], c='grey', alpha=0.15)
+                sc = plt.scatter(pca_tab.loc[good_cells, 'PC1'], pca_tab.loc[good_cells, 'PC2'], 
+                        c=subset[0].loc[event, good_cells], vmin = 0, vmax=1, s=50)
+
+                plt.colorbar(sc)
+
+                plt.xlabel('PC1', fontsize=24)
+                plt.ylabel('PC2', fontsize=24)
+                plt.title(event + ', ' + cell_type[j], fontsize=24)
+
+                plt.show()
+
+
+                plt.scatter(np.log10(mrna_per_event.loc[event, good_cells]+1), 
+                            subset[0].loc[event, good_cells], alpha=0.5)
+                plt.xlabel('log10(mRNA counts)', fontsize=24)
+                plt.ylabel(r'$\Psi$', fontsize=24)
+                plt.title(event + ' ' + cell_type[j], fontsize=24)
+                plt.show()
+
+
+                plt.scatter(np.log10(read_counts.loc[event, good_cells]+1), 
+                            subset[0].loc[event, good_cells], alpha=0.5)
+                plt.xlabel('log10(SJ read counts)', fontsize=24)
+                plt.ylabel(r'$\Psi$', fontsize=24)
+                plt.title(event + ', ' + cell_type[j], fontsize=24)
+                plt.show()
+            i += 1
+
+        j += 1
+
+
+
+def hartigan_multiple_test(subset_list, cell_type, pca_tab, mrna_per_event, 
+                     read_counts, quantile = 0.25, psi_lim = 0.25):
+    pvals = []
+
+    for subset in subset_list:
+
+        for event in subset[0].index:
+
+            ht = hartigan_test(subset[0].loc[event].dropna())
+            pvals.append(ht[1])
+
+
+    bh_correction = multipletests(pvals, method='fdr_bh')
+
+    i = 0
+    j = 0
+
+    for subset in subset_list:
+
+        for event in subset[0].index:
+
+            if bh_correction[0][i]:
+
+
+                plt.hist(subset[0].loc[event].dropna(), range=[0,1], density=True)
+                plt.title(event + ', ' + cell_type[j], fontsize=24)
+                plt.xlabel(r'$\Psi$', fontsize=24)
+                plt.ylabel('frequency', fontsize=24)
+                plt.show()
+
+                good_cells = subset[0].loc[event].dropna().index
+                
+                if 'sex' in pca_tab.columns:
+                
+                    good_male = [x for x in good_cells if x in pca_tab.loc[pca_tab.sex == 'male'].index]
+                    good_female = [x for x in good_cells if x not in good_male]
+
+                    plt.hist(subset[0].loc[event, good_male].dropna(), range=[0,1], density=True, color='skyblue', alpha=0.5)
+                    plt.hist(subset[0].loc[event, good_female].dropna(), range=[0,1], density=True, color='forestgreen', alpha=0.5)
+                    plt.title(event + ', ' + cell_type[j], fontsize=24)
+                    plt.xlabel(r'$\Psi$', fontsize=24)
+                    plt.ylabel('frequency', fontsize=24)
+                    plt.show()
+
+
+                sc = plt.scatter(pca_tab.loc[good_cells, 'PC1'], pca_tab.loc[good_cells, 'PC2'], 
+                        c=subset[0].loc[event, good_cells], vmin = 0, vmax=1)
+
+                plt.colorbar(sc)
+
+                plt.xlabel('PC1', fontsize=24)
+                plt.ylabel('PC2', fontsize=24)
+                plt.title(event + ', ' + cell_type[j], fontsize=24)
+
+                plt.show()
+
+
+                plt.scatter(np.log10(mrna_per_event.loc[event, good_cells]+1), 
+                            subset[0].loc[event, good_cells], alpha=0.5)
+                plt.xlabel('log10(mRNA counts)', fontsize=24)
+                plt.ylabel(r'$\Psi$', fontsize=24)
+                plt.title(event + ' ' + cell_type[j], fontsize=24)
+                plt.show()
+
+
+                plt.scatter(np.log10(read_counts.loc[event, good_cells]+1), 
+                            subset[0].loc[event, good_cells], alpha=0.5)
+                plt.xlabel('log10(SJ read counts)', fontsize=24)
+                plt.ylabel(r'$\Psi$', fontsize=24)
+                plt.title(event + ', ' + cell_type[j], fontsize=24)
+                plt.show()
+            i += 1
+
+        j += 1
+
+        
     
