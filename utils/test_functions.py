@@ -1,5 +1,8 @@
 current_palette = sns.color_palette('muted')
 
+from scipy.stats import friedmanchisquare
+from scipy.stats import zscore
+
 def hyper_test(M, n, N, k):
     
     hpd = hypergeom(M, n, N)
@@ -8,8 +11,30 @@ def hyper_test(M, n, N, k):
     
     return p_depleted, p_enriched
     
+from scipy.special import logit
     
-def run_anova(samples):
+def linearize_psi(sample):
+    linear_sample = []
+    for x in sample:
+        if x >= 0.99:
+            linear_sample.append(logit(0.99))
+        elif x <= (0.01):
+            linear_sample.append(logit(0.01))
+        else:
+            linear_sample.append(logit(x))
+    return linear_sample
+    
+def run_anova(samples, linearize = False):
+    
+    if linearize:
+#         print('linearized')
+
+#         samples = [linearize_psi(x) for x in samples]
+        samples = [x - np.mean(x) for x in samples]
+#         samples = [zscore(x) for x in samples]
+        
+#     print(np.max(samples[0]))
+        
     if len(samples) == 2:
         return kruskal(samples[0], samples[1])
     elif len(samples) == 3:
@@ -22,7 +47,7 @@ def run_anova(samples):
         return kruskal(samples[0], samples[1], samples[2], samples[3], samples[4], samples[5])
     
 
-def test_exon_bimodal_anova(PSI_tab, exon, pca_clust, clusters = 'AC', obs_min=0.5):
+def test_exon_bimodal_anova(PSI_tab, exon, pca_clust, clusters = 'AC', obs_min=0.5, linearize=False):
     
     obs_cells = PSI_tab.loc[exon].dropna().index
     
@@ -39,7 +64,7 @@ def test_exon_bimodal_anova(PSI_tab, exon, pca_clust, clusters = 'AC', obs_min=0
             psi = list(PSI_tab.loc[exon, c_cells])
             cluster_psi.append(psi)
     if len(cluster_psi) >= 3:
-        anova_p = run_anova(cluster_psi)[1]
+        anova_p = run_anova(cluster_psi, linearize)[1]
     else:
         anova_p = np.nan
         
@@ -49,7 +74,7 @@ def test_exon_bimodal_anova(PSI_tab, exon, pca_clust, clusters = 'AC', obs_min=0
 from tqdm import tqdm_notebook as tqdm
 
 def cluster_anova_test(PSI_tab, pca_clust, clusters, correction = 'fdr_bh', 
-                          correct_multitest = True, obs_min = 0.5):
+                          correct_multitest = True, obs_min = 0.5, linearize=False):
     cluster_array = []
     pvals = []
     exon_pass = []
@@ -61,7 +86,7 @@ def cluster_anova_test(PSI_tab, pca_clust, clusters, correction = 'fdr_bh',
 #       for exon in PSI_tab.index:
 #       t = time.time()
         exon = PSI_tab.index[i]
-        anv_p, pos, neg = test_exon_bimodal_anova(PSI_tab, exon, pca_clust, clusters = 'AC', obs_min=obs_min)
+        anv_p, pos, neg = test_exon_bimodal_anova(PSI_tab, exon, pca_clust, clusters = 'AC', obs_min=obs_min, linearize=linearize)
         if not np.isnan(anv_p):
             cluster_array.append(pos/(neg+pos))
             pvals.append(anv_p)
@@ -77,9 +102,9 @@ def cluster_anova_test(PSI_tab, pca_clust, clusters, correction = 'fdr_bh',
     print('not pass: '+str(not_pass))
     print('tested exons: ' + str(len(pvals)))
 #     print(not_pass)
-#     figsize(4, 4)
-#     plt.hist(pvals)
-#     plt.show()
+    figsize(4, 4)
+    plt.hist(pvals)
+    plt.show()
 #     if correct_multitest:
 #         pvals_adj = multipletests(pvals, method='fdr_bh')[1]
 #     else:
@@ -93,15 +118,15 @@ def cluster_anova_test(PSI_tab, pca_clust, clusters, correction = 'fdr_bh',
 
 
 def test_anova_filters(PSI_tab, mrna_counts, mrna_per_event, read_counts, coverage_tab, pca_clust, clusters = 'AC',
-                     psi_min = 0.2, obs_min = 0.5, mrna_min = 10, read_min = 10, filter_obs = False, 
-                    dset_name = '', correct_multitest = False):
+                     psi_min = 0.2, obs_min = 0.5, mrna_min = 10, mrna_read_min=10, read_min = 10, filter_obs = False, 
+                    dset_name = '', correct_multitest = False, linearize=False):
     
     observed = PSI_tab.loc[PSI_tab.isna().mean(axis=1) <= (1-obs_min)].index
     int_genes, int_exons = spu.get_int_events(PSI_tab.loc[observed], mrna_counts, psi_min)
 
 
     aver = filter_psi(PSI_tab, int_exons, mrna_per_event, coverage_tab['SJ_coverage'],
-              read_counts, mrna_min, 0, obs_min)
+              read_counts, mrna_min, mrna_read_min, obs_min)
     
     aver_mrna_only = filter_psi(PSI_tab, int_exons, mrna_per_event, coverage_tab['SJ_coverage'],
               read_counts, mrna_min, 0, obs_min, filter_cj = False)
@@ -110,7 +135,7 @@ def test_anova_filters(PSI_tab, mrna_counts, mrna_per_event, read_counts, covera
               read_counts, 0, read_min, obs_min)
     
     aver_all = filter_psi(PSI_tab, int_exons, mrna_per_event, coverage_tab['SJ_coverage'],
-              read_counts, mrna_min, 0, 0)
+              read_counts, mrna_min, mrna_read_min, 0)
     
     aver_all_mrna_only = filter_psi(PSI_tab, int_exons, mrna_per_event, coverage_tab['SJ_coverage'],
               read_counts, mrna_min, 0, 0, filter_cj = False)
@@ -124,11 +149,11 @@ def test_anova_filters(PSI_tab, mrna_counts, mrna_per_event, read_counts, covera
     print('intermediate exons: ' + str(len(joint_idx)))
     
     if filter_obs:
-        change_tab = cluster_anova_test(aver_all[0].loc[joint_idx], pca_clust, clusters, obs_min=obs_min)
-        change_tab_reads = cluster_anova_test(aver_all_reads[0].loc[joint_idx], pca_clust, clusters, obs_min=obs_min)
+        change_tab = cluster_anova_test(aver_all[0].loc[joint_idx], pca_clust, clusters, obs_min=obs_min, linearize=linearize)
+        change_tab_reads = cluster_anova_test(aver_all_reads[0].loc[joint_idx], pca_clust, clusters, obs_min=obs_min, linearize=linearize)
 #         change_tab_reads['pvals'] = chi_p_reads
     else:
-        change_tab = cluster_anova_test(PSI_tab.loc[joint_idx], pca_clust, clusters, obs_min=obs_min)
+        change_tab = cluster_anova_test(PSI_tab.loc[joint_idx], pca_clust, clusters, obs_min=obs_min, linearize=linearize)
         
     if correct_multitest:
         adj_pvals = multipletests(list(change_tab.pvals), method='fdr_bh')[1]
@@ -206,7 +231,7 @@ def cluster_chi_test(PSI_tab, clusters, psi_lim, correction = 'fdr_bh', correct_
 
 
 def test_chi_filters(PSI_tab, mrna_counts, mrna_per_event, read_counts, coverage_tab, clusters, 
-                     psi_min = 0.2, psi_bin = 0.25, obs_min = 0.5, mrna_min = 10, read_min = 10, filter_obs = False, 
+                     psi_min = 0.2, psi_bin = 0.25, obs_min = 0.5, mrna_min = 10, mrna_read_min=10, read_min = 10, filter_obs = False, 
                     dset_name = '', correct_multitest = False):
     
     observed = PSI_tab.loc[PSI_tab.isna().mean(axis=1) <= (1-obs_min)].index
@@ -214,7 +239,7 @@ def test_chi_filters(PSI_tab, mrna_counts, mrna_per_event, read_counts, coverage
 
 
     aver = filter_psi(PSI_tab, int_exons, mrna_per_event, coverage_tab['SJ_coverage'],
-              read_counts, mrna_min, 0, obs_min)
+              read_counts, mrna_min, mrna_read_min, obs_min)
     
     aver_mrna_only = filter_psi(PSI_tab, int_exons, mrna_per_event, coverage_tab['SJ_coverage'],
               read_counts, mrna_min, 0, obs_min, filter_cj = False)
@@ -223,7 +248,7 @@ def test_chi_filters(PSI_tab, mrna_counts, mrna_per_event, read_counts, coverage
               read_counts, 0, read_min, obs_min)
     
     aver_all = filter_psi(PSI_tab, int_exons, mrna_per_event, coverage_tab['SJ_coverage'],
-              read_counts, mrna_min, 0, 0)
+              read_counts, mrna_min, mrna_read_min, 0)
     
     aver_all_mrna_only = filter_psi(PSI_tab, int_exons, mrna_per_event, coverage_tab['SJ_coverage'],
               read_counts, mrna_min, 0, 0, filter_cj = False)
@@ -360,7 +385,7 @@ def cluster_hypergeom_test(PSI_tab, clusters, psi_lim, correction = 'fdr_bh', co
 
 
 def test_hypergeom_filters(PSI_tab, mrna_counts, mrna_per_event, read_counts, coverage_tab, clusters, 
-                     psi_min = 0.2, psi_bin = 0.25, obs_min = 0.5, mrna_min = 10, read_min = 10, filter_obs = False, 
+                     psi_min = 0.2, psi_bin = 0.25, obs_min = 0.5, mrna_min = 10, mrna_read_min=10, read_min = 10, filter_obs = False, 
                     dset_name = '', correct_multitest=False):
     
     observed = PSI_tab.loc[PSI_tab.isna().mean(axis=1) <= (1-obs_min)].index
@@ -368,7 +393,7 @@ def test_hypergeom_filters(PSI_tab, mrna_counts, mrna_per_event, read_counts, co
 
 
     aver = filter_psi(PSI_tab, int_exons, mrna_per_event, coverage_tab['SJ_coverage'],
-              read_counts, mrna_min, 0, obs_min)
+              read_counts, mrna_min, mrna_read_min, obs_min)
     
     aver_mrna_only = filter_psi(PSI_tab, int_exons, mrna_per_event, coverage_tab['SJ_coverage'],
               read_counts, mrna_min, 0, obs_min, filter_cj = False)
@@ -377,7 +402,7 @@ def test_hypergeom_filters(PSI_tab, mrna_counts, mrna_per_event, read_counts, co
               read_counts, 0, read_min, obs_min)
     
     aver_all = filter_psi(PSI_tab, int_exons, mrna_per_event, coverage_tab['SJ_coverage'],
-              read_counts, mrna_min, 0, 0)
+              read_counts, mrna_min, mrna_read_min, 0)
     
     aver_all_mrna_only = filter_psi(PSI_tab, int_exons, mrna_per_event, coverage_tab['SJ_coverage'],
               read_counts, mrna_min, 0, 0, filter_cj = False)
@@ -413,7 +438,7 @@ def test_hypergeom_filters(PSI_tab, mrna_counts, mrna_per_event, read_counts, co
 ########
 ########
 
-def test_exon_bimodal_spearman(PSI_tab, exon, obs_min, pca_clust, clusters = 'AC', one_test = False):
+def test_exon_bimodal_spearman(PSI_tab, exon, obs_min, pca_clust, clusters = 'AC', one_test = False, linearize=False):
     
 #     print(psi_lim)
     
@@ -423,6 +448,10 @@ def test_exon_bimodal_spearman(PSI_tab, exon, obs_min, pca_clust, clusters = 'AC
         
         
         psi = list(PSI_tab.loc[exon, obs_cells])
+        
+        if linearize:
+            psi = linearize_psi(psi)
+        
         pseudotime =  list(pca_clust.loc[obs_cells, 'pseudotime'])
         
         spearman_p = spearmanr(pseudotime, psi)[1]
@@ -447,6 +476,10 @@ def test_exon_bimodal_spearman(PSI_tab, exon, obs_min, pca_clust, clusters = 'AC
             
             cluster_cells = list(c1_cells) + list(c2_cells)
             psi = list(PSI_tab.loc[exon, cluster_cells])
+            
+            if linearize:
+                psi = linearize_psi(psi)
+            
             pseudotime =  list(pca_clust.loc[cluster_cells, 'pseudotime'])
             
             if ((len(c1_cells)/len(c1_)) >= obs_min) and ((len(c1_cells)/len(c1_)) >= obs_min):
@@ -467,7 +500,7 @@ def test_exon_bimodal_spearman(PSI_tab, exon, obs_min, pca_clust, clusters = 'AC
 
 
 def cluster_spearman_test(PSI_tab, pca_clust, clusters, obs_min, correction = 'fdr_bh', 
-                          correct_multitest = True, one_test = False):
+                          correct_multitest = True, one_test = False, linearize=False):
     cluster_array = []
     pvals = []
     exon_pass = []
@@ -476,7 +509,7 @@ def cluster_spearman_test(PSI_tab, pca_clust, clusters, obs_min, correction = 'f
 
         exon = PSI_tab.index[i]
         chi_p, pos, neg = test_exon_bimodal_spearman(PSI_tab, exon, obs_min, pca_clust, clusters = 'AC', 
-                                                     one_test = one_test)
+                                                     one_test = one_test, linearize=linearize)
         if not np.isnan(chi_p):
             cluster_array.append(pos/(neg+pos))
             pvals.append(chi_p)
@@ -503,15 +536,15 @@ def cluster_spearman_test(PSI_tab, pca_clust, clusters, obs_min, correction = 'f
 
 
 def test_spearman_filters(PSI_tab, mrna_counts, mrna_per_event, read_counts, coverage_tab, pca_clust, clusters = 'AC',
-                     psi_min = 0.2, obs_min = 0.5, mrna_min = 10, read_min = 10, filter_obs = False, 
-                    dset_name = '', one_test = False, correct_multitest=False):
+                     psi_min = 0.2, obs_min = 0.5, mrna_min = 10, mrna_read_min=10, read_min = 10, filter_obs = False, 
+                    dset_name = '', one_test = False, correct_multitest=False, linearize=False):
     
     observed = PSI_tab.loc[PSI_tab.isna().mean(axis=1) <= (1-obs_min)].index
     int_genes, int_exons = spu.get_int_events(PSI_tab.loc[observed], mrna_counts, psi_min)
 
 
     aver = filter_psi(PSI_tab, int_exons, mrna_per_event, coverage_tab['SJ_coverage'],
-              read_counts, mrna_min, 0, obs_min)
+              read_counts, mrna_min, mrna_read_min, obs_min)
     
     aver_mrna_only = filter_psi(PSI_tab, int_exons, mrna_per_event, coverage_tab['SJ_coverage'],
               read_counts, mrna_min, 0, obs_min, filter_cj=False)
@@ -520,7 +553,7 @@ def test_spearman_filters(PSI_tab, mrna_counts, mrna_per_event, read_counts, cov
               read_counts, 0, read_min, obs_min)
     
     aver_all = filter_psi(PSI_tab, int_exons, mrna_per_event, coverage_tab['SJ_coverage'],
-              read_counts, mrna_min, 0, 0)
+              read_counts, mrna_min, mrna_read_min, 0)
     
     aver_all_mrna_only = filter_psi(PSI_tab, int_exons, mrna_per_event, coverage_tab['SJ_coverage'],
               read_counts, mrna_min, 0, 0, filter_cj=False)
@@ -535,12 +568,12 @@ def test_spearman_filters(PSI_tab, mrna_counts, mrna_per_event, read_counts, cov
     
     if filter_obs:
         change_tab, chi_p = cluster_spearman_test(aver_all[0].loc[joint_idx], pca_clust, clusters, 
-                                                  one_test = one_test)
+                                                  one_test = one_test, linearize=linearize)
         change_tab_reads, chi_p_reads = cluster_spearman_test(aver_all_reads[0].loc[joint_idx], pca_clust, 
-                                                              clusters, one_test = one_test)
+                                                              clusters, one_test = one_test, linearize=linearize)
         change_tab_reads['pvals'] = chi_p_reads
     else:
-        change_tab = cluster_spearman_test(PSI_tab.loc[joint_idx], pca_clust, clusters, obs_min, one_test = one_test)
+        change_tab = cluster_spearman_test(PSI_tab.loc[joint_idx], pca_clust, clusters, obs_min, one_test = one_test, linearize=linearize)
         
     
     if correct_multitest:
@@ -587,12 +620,15 @@ def get_statistics(pvals, selected_exons, x, beta):
     recall = len(TP)/len(X1) # Also called sensitivity, or TPR
     precision = len(TP)/len(X3)
     specificity = len(TN)/len(X2)
-    F1_score = (1+(beta**2))*(precision*recall)/(((beta**2)*precision)+recall)
+    try:
+        F1_score = (1+(beta**2))*(precision*recall)/(((beta**2)*precision)+recall)
+    except:
+        F1_score = np.nan
     hyper_recall_specificity = (1+(beta**2))*(specificity*recall)/(((beta**2)*specificity)+recall)
     
     
-    LRplus = recall/(len(FP)/len(X2))
-    LRminus = (len(FN)/len(X1))/(specificity)
+#     LRplus = recall/(len(FP)/len(X2))
+#     LRminus = (len(FN)/len(X1))/(specificity)
     try:
         DOR = (recall*specificity)/((1-recall)*(1-specificity))
     except:
@@ -601,7 +637,7 @@ def get_statistics(pvals, selected_exons, x, beta):
     ACC = (len(TP) + len(TN)) / (len(X1)+len(X2))
     BA = (recall*specificity)/2
     
-    return recall, precision, specificity, F1_score, hyper_recall_specificity, LRplus, LRminus, DOR, ACC, BA
+    return recall, precision, specificity, F1_score, hyper_recall_specificity, DOR, ACC, BA#, LRplus, LRminus, DOR, ACC, BA
 
 
 def summary_curves(pvals, selected_exons, p_limits, beta):
@@ -610,8 +646,8 @@ def summary_curves(pvals, selected_exons, p_limits, beta):
     specificity_list = []
     f1_score_list = []
     hrs_list = []
-    LRplus_list = []
-    LRminus_list = []
+#     LRplus_list = []
+#     LRminus_list = []
     DOR_list = []
     ACC_list = []
     BA_list = []
@@ -620,20 +656,20 @@ def summary_curves(pvals, selected_exons, p_limits, beta):
 #     for i in tqdm(range(len(p_limits))):
 #         x = p_limits[i]
         
-        recall, precision, specificity, f1_score, hrs, LRplus, LRminus, DOR , ACC, BA = get_statistics(pvals, selected_exons, x, beta)
+        recall, precision, specificity, f1_score, hrs, DOR , ACC, BA = get_statistics(pvals, selected_exons, x, beta)
         recall_list.append(recall)
         precision_list.append(precision)
         specificity_list.append(specificity)
         f1_score_list.append(f1_score)
         hrs_list.append(hrs)
-        LRplus_list.append(LRplus)
-        LRminus_list.append(LRminus)
+#         LRplus_list.append(LRplus)
+#         LRminus_list.append(LRminus)
 #         DOR = LRplus/LRminus
         DOR_list.append(DOR)
         ACC_list.append(ACC)
         BA_list.append(BA)
         
-    return recall_list, precision_list, specificity_list, f1_score_list, hrs_list, LRplus_list, LRminus_list, DOR_list, ACC_list, BA_list
+    return recall_list, precision_list, specificity_list, f1_score_list, hrs_list, DOR_list, ACC_list, BA_list
     
 
 
@@ -649,9 +685,9 @@ def summary_plots(data_out, dset_name,
         p_limits = 10**(-np.arange(-np.log10(p_lim), -np.log10(p_low)+p_steps, p_steps))
                #10**np.arange(-np.log10(p_lim), -np.log10(p_low)+p_steps, p_steps)
     
-    recall_mrna, precision_mrna, specificity_mrna, f1_score_mrna, hrs_mrna, LRplus_mrna, LRminus_mrna, DOR_mrna, ACC_mrna, BA_mrna = summary_curves(pvals, selected_mrna, p_limits, beta)
-    recall_mrna_only, precision_mrna_only, specificity_mrna_only, f1_score_mrna_only, hrs_mrna_only, LRplus_mrna_only, LRminus_mrna_only, DOR_mrna_only, ACC_mrna_only, BA_mrna_only = summary_curves(pvals, selected_mrna_only, p_limits, beta)
-    recall_read, precision_read, specificity_read, f1_score_read, hrs_read, LRplus_read, LRminus_read, DOR_read, ACC_read, BA_read = summary_curves(pvals, selected_read, p_limits, beta)
+    recall_mrna, precision_mrna, specificity_mrna, f1_score_mrna, hrs_mrna, DOR_mrna, ACC_mrna, BA_mrna = summary_curves(pvals, selected_mrna, p_limits, beta)
+    recall_mrna_only, precision_mrna_only, specificity_mrna_only, f1_score_mrna_only, hrs_mrna_only, DOR_mrna_only, ACC_mrna_only, BA_mrna_only = summary_curves(pvals, selected_mrna_only, p_limits, beta)
+    recall_read, precision_read, specificity_read, f1_score_read, hrs_read, DOR_read, ACC_read, BA_read = summary_curves(pvals, selected_read, p_limits, beta)
     
     
     figsize(6,4)
@@ -659,7 +695,7 @@ def summary_plots(data_out, dset_name,
     ax  = plt.subplot(1,1,1)
     
     ax.plot(-np.log10(p_limits), recall_read, c='darkred', label='read filter', linewidth = 3)
-    ax.plot(-np.log10(p_limits), recall_mrna_only, c='forestgreen', label='mRNA only filter', linewidth = 3)
+#     ax.plot(-np.log10(p_limits), recall_mrna_only, c='forestgreen', label='mRNA only filter', linewidth = 3)
     ax.plot(-np.log10(p_limits), recall_mrna, c='navy', label='mRNA filter', linewidth = 3)
     
     ax.spines["right"].set_visible(False)
@@ -684,7 +720,7 @@ def summary_plots(data_out, dset_name,
     ax  = plt.subplot(1,1,1)
     
     ax.plot(-np.log10(p_limits), precision_read, c='darkred', label='read filter', linewidth = 3)
-    ax.plot(-np.log10(p_limits), precision_mrna_only, c='forestgreen', label='mRNA only filter', linewidth=3)
+#     ax.plot(-np.log10(p_limits), precision_mrna_only, c='forestgreen', label='mRNA only filter', linewidth=3)
     ax.plot(-np.log10(p_limits), precision_mrna, c='navy', label='mRNA filter', linewidth=3)
     
     ax.spines["right"].set_visible(False)
@@ -707,7 +743,7 @@ def summary_plots(data_out, dset_name,
     ax  = plt.subplot(1,1,1)
     
     ax.plot(-np.log10(p_limits), specificity_read, c='darkred', label='read filter', linewidth=3)
-    ax.plot(-np.log10(p_limits), specificity_mrna_only, c='forestgreen', label='mRNA only filter', linewidth=3)
+#     ax.plot(-np.log10(p_limits), specificity_mrna_only, c='forestgreen', label='mRNA only filter', linewidth=3)
     ax.plot(-np.log10(p_limits), specificity_mrna, c='navy', label='mRNA filter', linewidth=3)
     
     ax.spines["right"].set_visible(False)
@@ -731,7 +767,7 @@ def summary_plots(data_out, dset_name,
     ax  = plt.subplot(1,1,1)
     
     ax.plot(-np.log10(p_limits), f1_score_read, c='darkred', label='read filter', linewidth=3)
-    ax.plot(-np.log10(p_limits), f1_score_mrna_only, c='forestgreen', label='mRNA only filter', linewidth=3)
+#     ax.plot(-np.log10(p_limits), f1_score_mrna_only, c='forestgreen', label='mRNA only filter', linewidth=3)
     ax.plot(-np.log10(p_limits), f1_score_mrna, c='navy', label='mRNA filter', linewidth=3)
 
 
@@ -757,7 +793,7 @@ def summary_plots(data_out, dset_name,
     ax  = plt.subplot(1,1,1)
     
     ax.plot(-np.log10(p_limits), hrs_read, c='darkred', label='read filter', linewidth=3)
-    ax.plot(-np.log10(p_limits), hrs_mrna_only, c='forestgreen', label='mRNA only filter', linewidth=3)
+#     ax.plot(-np.log10(p_limits), hrs_mrna_only, c='forestgreen', label='mRNA only filter', linewidth=3)
     ax.plot(-np.log10(p_limits), hrs_mrna, c='navy', label='mRNA filter', linewidth=3)
     
    
@@ -779,55 +815,55 @@ def summary_plots(data_out, dset_name,
     
     
     
-    ##################
+#     ##################
     
-#     figsize(14,10)
-    fig = plt.figure()
-    ax  = plt.subplot(1,1,1)
+# #     figsize(14,10)
+#     fig = plt.figure()
+#     ax  = plt.subplot(1,1,1)
     
-    ax.plot(-np.log10(p_limits), LRplus_read, c='darkred', label='read filter', linewidth=3)
-    ax.plot(-np.log10(p_limits), LRplus_mrna_only, c='forestgreen', label='mRNA only filter', linewidth=3)
-    ax.plot(-np.log10(p_limits), LRplus_mrna, c='navy', label='mRNA filter', linewidth=3)
+#     ax.plot(-np.log10(p_limits), LRplus_read, c='darkred', label='read filter', linewidth=3)
+#     ax.plot(-np.log10(p_limits), LRplus_mrna_only, c='forestgreen', label='mRNA only filter', linewidth=3)
+#     ax.plot(-np.log10(p_limits), LRplus_mrna, c='navy', label='mRNA filter', linewidth=3)
 
-    ax.spines["right"].set_visible(False)
-    ax.spines["top"].set_visible(False)
-    ax.tick_params(labelsize=28, length=5)
-    plt.title('Positive likelihood ratio, ' + dset_name, fontsize=28)
-    plt.xlabel('-log10 p-value', fontsize=28)
-    plt.ylabel('LR+', fontsize=28)
-    #plt.legend(frameon=False, fontsize=28)
-    plt.xticks([1, 2, 3, 4, 5], ['1', '2', '3', '4', '5'])
+#     ax.spines["right"].set_visible(False)
+#     ax.spines["top"].set_visible(False)
+#     ax.tick_params(labelsize=28, length=5)
+#     plt.title('Positive likelihood ratio, ' + dset_name, fontsize=28)
+#     plt.xlabel('-log10 p-value', fontsize=28)
+#     plt.ylabel('LR+', fontsize=28)
+#     #plt.legend(frameon=False, fontsize=28)
+#     plt.xticks([1, 2, 3, 4, 5], ['1', '2', '3', '4', '5'])
     
-    plt.savefig('plots_review/figure3/anova/LRplus_' + dset_name + '.svg', bbox_inches='tight')
-    plt.savefig('plots_review/figure3/anova/LRplus_' + dset_name + '.pdf', bbox_inches='tight')
-    plt.savefig('plots_review/figure3/anova/LRplus_' + dset_name + '.png', dpi=300, bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/LRplus_' + dset_name + '.svg', bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/LRplus_' + dset_name + '.pdf', bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/LRplus_' + dset_name + '.png', dpi=300, bbox_inches='tight')
     
-    plt.show()
+#     plt.show()
 
     
     
-#     figsize(14,10)
-    fig = plt.figure()
-    ax  = plt.subplot(1,1,1)
+# #     figsize(14,10)
+#     fig = plt.figure()
+#     ax  = plt.subplot(1,1,1)
     
-    ax.plot(-np.log10(p_limits), LRminus_read, c='darkred', label='read filter', linewidth=3)
-    ax.plot(-np.log10(p_limits), LRminus_mrna_only, c='forestgreen', label='mRNA only filter', linewidth=3)
-    ax.plot(-np.log10(p_limits), LRminus_mrna, c='navy', label='mRNA filter', linewidth=3)
+#     ax.plot(-np.log10(p_limits), LRminus_read, c='darkred', label='read filter', linewidth=3)
+#     ax.plot(-np.log10(p_limits), LRminus_mrna_only, c='forestgreen', label='mRNA only filter', linewidth=3)
+#     ax.plot(-np.log10(p_limits), LRminus_mrna, c='navy', label='mRNA filter', linewidth=3)
     
-    ax.spines["right"].set_visible(False)
-    ax.spines["top"].set_visible(False)
-    ax.tick_params(labelsize=28, length=5)
-    plt.title('Negative likelihood ratio, ' + dset_name, fontsize=28)
-    plt.xlabel('-log10 p-value', fontsize=28)
-    plt.ylabel('LR-', fontsize=28)
-    #plt.legend(frameon=False, fontsize=28)
-    plt.xticks([1, 2, 3, 4, 5], ['1', '2', '3', '4', '5'])
+#     ax.spines["right"].set_visible(False)
+#     ax.spines["top"].set_visible(False)
+#     ax.tick_params(labelsize=28, length=5)
+#     plt.title('Negative likelihood ratio, ' + dset_name, fontsize=28)
+#     plt.xlabel('-log10 p-value', fontsize=28)
+#     plt.ylabel('LR-', fontsize=28)
+#     #plt.legend(frameon=False, fontsize=28)
+#     plt.xticks([1, 2, 3, 4, 5], ['1', '2', '3', '4', '5'])
     
-    plt.savefig('plots_review/figure3/anova/LRminus_' + dset_name + '.svg', bbox_inches='tight')
-    plt.savefig('plots_review/figure3/anova/LRminus_' + dset_name + '.pdf', bbox_inches='tight')
-    plt.savefig('plots_review/figure3/anova/LRminus_' + dset_name + '.png', dpi=300, bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/LRminus_' + dset_name + '.svg', bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/LRminus_' + dset_name + '.pdf', bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/LRminus_' + dset_name + '.png', dpi=300, bbox_inches='tight')
     
-    plt.show()
+#     plt.show()
     
     
     
@@ -836,7 +872,7 @@ def summary_plots(data_out, dset_name,
     ax  = plt.subplot(1,1,1)
     
     ax.plot(-np.log10(p_limits), DOR_read, c='darkred', label='read filter', linewidth=3)
-    ax.plot(-np.log10(p_limits), DOR_mrna_only, c='forestgreen', label='mRNA only filter', linewidth=3)
+#     ax.plot(-np.log10(p_limits), DOR_mrna_only, c='forestgreen', label='mRNA only filter', linewidth=3)
     ax.plot(-np.log10(p_limits), DOR_mrna, c='navy', label='mRNA filter', linewidth=3)
     
     ax.spines["right"].set_visible(False)
@@ -864,7 +900,7 @@ def summary_plots(data_out, dset_name,
     ax  = plt.subplot(1,1,1)
     
     ax.plot(-np.log10(p_limits), ACC_read, c='darkred', label='read filter', linewidth=3)
-    ax.plot(-np.log10(p_limits), ACC_mrna_only, c='forestgreen', label='mRNA only filter', linewidth=3)
+#     ax.plot(-np.log10(p_limits), ACC_mrna_only, c='forestgreen', label='mRNA only filter', linewidth=3)
     ax.plot(-np.log10(p_limits), ACC_mrna, c='navy', label='mRNA filter', linewidth=3)
     
     ax.spines["right"].set_visible(False)
@@ -891,7 +927,7 @@ def summary_plots(data_out, dset_name,
     ax  = plt.subplot(1,1,1)
     
     ax.plot(-np.log10(p_limits), BA_read, c='darkred', label='read filter', linewidth=3)
-    ax.plot(-np.log10(p_limits), BA_mrna_only, c='forestgreen', label='mRNA only filter', linewidth=3)
+#     ax.plot(-np.log10(p_limits), BA_mrna_only, c='forestgreen', label='mRNA only filter', linewidth=3)
     ax.plot(-np.log10(p_limits), BA_mrna, c='navy', label='mRNA filter', linewidth=3)
     
     ax.spines["right"].set_visible(False)

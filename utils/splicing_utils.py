@@ -322,9 +322,9 @@ def filter_psi(psi_tab, int_exons, mrna_tab, cj, reads_tab, mrna_min, reads_min=
         cj_factor = 0
 
     cj_filter = (reads_tab.loc[int_exons, cj.index] >= (mrna_min*cj_factor*cj*(1+psi_tab.loc[int_exons, cj.index])))
-#     mrna_filter = (mrna_tab.loc[int_exons, cj.index] >= mrna_min) & (reads_tab.loc[int_exons, cj.index] >= reads_min) #&
+    mrna_filter = (mrna_tab.loc[int_exons, cj.index] >= mrna_min) & (reads_tab.loc[int_exons, cj.index] >= reads_min) #&
     ##### reads_min*(1+psi_tab.loc[int_exons, cj.index])
-    mrna_filter = (mrna_tab.loc[int_exons, cj.index] >= mrna_min) & (reads_tab.loc[int_exons, cj.index] >= (reads_min*(1+psi_tab.loc[int_exons, cj.index]))) #&
+    #mrna_filter = (mrna_tab.loc[int_exons, cj.index] >= mrna_min) & (reads_tab.loc[int_exons, cj.index] >= (reads_min*(1+psi_tab.loc[int_exons, cj.index]))) #&
     quality = ((mrna_filter & cj_filter).mean(axis=1) >= cell_min)
     good_exons = quality.loc[quality].index
 

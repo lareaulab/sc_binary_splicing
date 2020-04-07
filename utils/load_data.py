@@ -13,7 +13,7 @@ from pylab import *
 from matplotlib.gridspec import GridSpec
 
 import sys
-sys.path.insert(0, '../../utils')
+sys.path.insert(0, '.')
 import splicing_utils as spu
 from splicing_utils import *
 import single_cell_plots as scp
@@ -31,90 +31,91 @@ from sklearn.cluster import KMeans
 from sklearn.cluster import AgglomerativeClustering
 
 mpl.rcParams["mathtext.fontset"] = "stix"
+mpl.rcParams['pdf.fonttype'] = 42
 
 
 # PSI tables
-chen_PSI = pd.read_csv('../../../data/chen/processed_tables/chen.skipped_exons_psi.tab', sep='\t', index_col=0)
-song_PSI = pd.read_csv('../../../data/song/processed_tables/song.skipped_exons_psi.tab', sep='\t',  index_col=0)
-das_PSI = pd.read_csv('../../../data/das/processed_tables/das.skipped_exons_psi.tab', sep='\t',  index_col=0)
-trapnell_PSI = pd.read_csv('../../../data/trapnell/processed_tables/trapnell.skipped_exons_psi.tab', 
+chen_PSI = pd.read_csv(data_dir + 'chen/processed_tables/chen.skipped_exons_psi.tab', sep='\t', index_col=0)
+song_PSI = pd.read_csv(data_dir + 'song/processed_tables/song.skipped_exons_psi.tab', sep='\t',  index_col=0)
+das_PSI = pd.read_csv(data_dir + 'das/processed_tables/das.skipped_exons_psi.tab', sep='\t',  index_col=0)
+trapnell_PSI = pd.read_csv(data_dir + 'trapnell/processed_tables/trapnell.skipped_exons_psi.tab', 
                     sep='\t',  index_col=0)
-lescroart_PSI = pd.read_csv('../../../data/lescroart/processed_tables/lescroart.skipped_exons_psi.tab', 
+lescroart_PSI = pd.read_csv(data_dir + 'lescroart/processed_tables/lescroart.skipped_exons_psi.tab', 
                      sep='\t',  index_col=0)
-shalek_PSI = pd.read_csv('../../../data/shalek/processed_tables/shalek.skipped_exons_psi.tab', sep='\t', index_col=0)
+shalek_PSI = pd.read_csv(data_dir + 'shalek/processed_tables/shalek.skipped_exons_psi.tab', sep='\t', index_col=0)
 
 # SJ read tables
-chen_read_counts = pd.read_csv('../../../data/chen/processed_tables/chen.skipped_exons_SJreads.tab', sep='\t', index_col=0)
-song_read_counts = pd.read_csv('../../../data/song/processed_tables/song.skipped_exons_SJreads.tab', sep='\t', index_col=0)
-das_read_counts = pd.read_csv('../../../data/das/processed_tables/das.skipped_exons_SJreads.tab', sep='\t',  index_col=0)
-trapnell_read_counts = pd.read_csv('../../../data/trapnell/processed_tables/trapnell.skipped_exons_SJreads.tab', 
+chen_read_counts = pd.read_csv(data_dir + 'chen/processed_tables/chen.skipped_exons_SJreads.tab', sep='\t', index_col=0)
+song_read_counts = pd.read_csv(data_dir + 'song/processed_tables/song.skipped_exons_SJreads.tab', sep='\t', index_col=0)
+das_read_counts = pd.read_csv(data_dir + 'das/processed_tables/das.skipped_exons_SJreads.tab', sep='\t',  index_col=0)
+trapnell_read_counts = pd.read_csv(data_dir + 'trapnell/processed_tables/trapnell.skipped_exons_SJreads.tab', 
                             sep='\t', index_col=0)
-lescroart_read_counts = pd.read_csv('../../../data/lescroart/processed_tables/lescroart.skipped_exons_SJreads.tab', 
+lescroart_read_counts = pd.read_csv(data_dir + 'lescroart/processed_tables/lescroart.skipped_exons_SJreads.tab', 
                              sep='\t', index_col=0)
-shalek_read_counts = pd.read_csv('../../../data/shalek/processed_tables/shalek.skipped_exons_SJreads.tab', 
+shalek_read_counts = pd.read_csv(data_dir + 'shalek/processed_tables/shalek.skipped_exons_SJreads.tab', 
                           sep='\t', index_col=0)
 
 # TPM tables
-chen_tpm_tab = pd.read_csv('../../../data/chen/chen.tpm.gene_symbols.tab', sep='\t', index_col=0)
-song_tpm_tab = pd.read_csv('../../../data/song/song.tpm.gene_symbols.tab', sep='\t', index_col=0)
-trapnell_tpm_tab = pd.read_csv('../../../data/trapnell/trapnell.tpm.gene_symbols.tab', sep='\t', index_col=0)
-lescroart_tpm_tab = pd.read_csv('../../../data/lescroart/lescroart.tpm.gene_symbols.tab', sep='\t', index_col=0)
-shalek_tpm_tab = pd.read_csv('../../../data/shalek/shalek.tpm.gene_symbols.tab', sep='\t', index_col=0)
-das_tpm_tab = pd.read_csv('../../../data/das/das.tpm.gene_symbols.tab', sep='\t', index_col=0)
+chen_tpm_tab = pd.read_csv(data_dir + 'chen/chen.tpm.gene_symbols.tab', sep='\t', index_col=0)
+song_tpm_tab = pd.read_csv(data_dir + 'song/song.tpm.gene_symbols.tab', sep='\t', index_col=0)
+trapnell_tpm_tab = pd.read_csv(data_dir + 'trapnell/trapnell.tpm.gene_symbols.tab', sep='\t', index_col=0)
+lescroart_tpm_tab = pd.read_csv(data_dir + 'lescroart/lescroart.tpm.gene_symbols.tab', sep='\t', index_col=0)
+shalek_tpm_tab = pd.read_csv(data_dir + 'shalek/shalek.tpm.gene_symbols.tab', sep='\t', index_col=0)
+das_tpm_tab = pd.read_csv(data_dir + 'das/das.tpm.gene_symbols.tab', sep='\t', index_col=0)
 
 
 
-chen_counts_tab = pd.read_csv('../../../data/chen/processed_tables/chen.rsemCounts.gene_symbols.tab', 
+chen_counts_tab = pd.read_csv(data_dir + 'chen/processed_tables/chen.rsemCounts.gene_symbols.tab', 
                        sep='\t', index_col=0)
-song_counts_tab = pd.read_csv('../../../data/song/processed_tables/song.rsemCounts.gene_symbols.tab', 
+song_counts_tab = pd.read_csv(data_dir + 'song/processed_tables/song.rsemCounts.gene_symbols.tab', 
                        sep='\t', index_col=0)
-das_counts_tab = pd.read_csv('../../../data/das/processed_tables/das.rsemCounts.gene_symbols.tab', 
+das_counts_tab = pd.read_csv(data_dir + 'das/processed_tables/das.rsemCounts.gene_symbols.tab', 
                       sep='\t', index_col=0)
-trapnell_counts_tab = pd.read_csv('../../../data/trapnell/processed_tables/trapnell.rsemCounts.gene_symbols.tab', 
+trapnell_counts_tab = pd.read_csv(data_dir + 'trapnell/processed_tables/trapnell.rsemCounts.gene_symbols.tab', 
                            sep='\t', index_col=0)
-lescroart_counts_tab = pd.read_csv('../../../data/lescroart/processed_tables/lescroart.rsemCounts.gene_symbols.tab', 
+lescroart_counts_tab = pd.read_csv(data_dir + 'lescroart/processed_tables/lescroart.rsemCounts.gene_symbols.tab', 
                             sep='\t', index_col=0)
-shalek_counts_tab = pd.read_csv('../../../data/shalek/processed_tables/shalek.rsemCounts.gene_symbols.tab', 
+shalek_counts_tab = pd.read_csv(data_dir + 'shalek/processed_tables/shalek.rsemCounts.gene_symbols.tab', 
                          sep='\t', index_col=0)
 
 # mRNA tables
-chen_mrna_counts = pd.read_csv('../../../data/chen/processed_tables/chen.mrna_counts.tab', sep='\t', index_col=0)
-song_mrna_counts = pd.read_csv('../../../data/song/processed_tables/song.mrna_counts.tab', sep='\t', index_col=0)
-das_mrna_counts = pd.read_csv('../../../data/das/processed_tables/das.mrna_counts.tab', sep='\t', index_col=0)
-trapnell_mrna_counts = pd.read_csv('../../../data/trapnell/processed_tables/trapnell.mrna_counts.tab', 
+chen_mrna_counts = pd.read_csv(data_dir + 'chen/processed_tables/chen.mrna_counts.tab', sep='\t', index_col=0)
+song_mrna_counts = pd.read_csv(data_dir + 'song/processed_tables/song.mrna_counts.tab', sep='\t', index_col=0)
+das_mrna_counts = pd.read_csv(data_dir + 'das/processed_tables/das.mrna_counts.tab', sep='\t', index_col=0)
+trapnell_mrna_counts = pd.read_csv(data_dir + 'trapnell/processed_tables/trapnell.mrna_counts.tab', 
                             sep='\t', index_col=0)
-lescroart_mrna_counts = pd.read_csv('../../../data/lescroart/processed_tables/lescroart.mrna_counts.tab', 
+lescroart_mrna_counts = pd.read_csv(data_dir + 'lescroart/processed_tables/lescroart.mrna_counts.tab', 
                              sep='\t', index_col=0)
-shalek_mrna_counts = pd.read_csv('../../../data/shalek/processed_tables/shalek.mrna_counts.tab', 
+shalek_mrna_counts = pd.read_csv(data_dir + 'shalek/processed_tables/shalek.mrna_counts.tab', 
                           sep='\t', index_col=0)
 
 # mRNA per event rables
-mrna_per_event_chen = pd.read_csv('../../../data/chen/processed_tables/chen.mrna_counts_per_event.tab', sep='\t', index_col=0)
-mrna_per_event_song = pd.read_csv('../../../data/song/processed_tables/song.mrna_counts_per_event.tab', sep='\t', index_col=0)
-mrna_per_event_das = pd.read_csv('../../../data/das/processed_tables/das.mrna_counts_per_event.tab', sep='\t', index_col=0)
-mrna_per_event_trapnell = pd.read_csv('../../../data/trapnell/processed_tables/trapnell.mrna_counts_per_event.tab', 
+mrna_per_event_chen = pd.read_csv(data_dir + 'chen/processed_tables/chen.mrna_counts_per_event.tab', sep='\t', index_col=0)
+mrna_per_event_song = pd.read_csv(data_dir + 'song/processed_tables/song.mrna_counts_per_event.tab', sep='\t', index_col=0)
+mrna_per_event_das = pd.read_csv(data_dir + 'das/processed_tables/das.mrna_counts_per_event.tab', sep='\t', index_col=0)
+mrna_per_event_trapnell = pd.read_csv(data_dir + 'trapnell/processed_tables/trapnell.mrna_counts_per_event.tab', 
                             sep='\t', index_col=0)
-mrna_per_event_lescroart = pd.read_csv('../../../data/lescroart/processed_tables/lescroart.mrna_counts_per_event.tab', 
+mrna_per_event_lescroart = pd.read_csv(data_dir + 'lescroart/processed_tables/lescroart.mrna_counts_per_event.tab', 
                              sep='\t', index_col=0)
-mrna_per_event_shalek = pd.read_csv('../../../data/shalek/processed_tables/shalek.mrna_counts_per_event.tab', 
+mrna_per_event_shalek = pd.read_csv(data_dir + 'shalek/processed_tables/shalek.mrna_counts_per_event.tab', 
                           sep='\t', index_col=0)
 
 # read coverage tables
-chen_coverage_tab = pd.read_csv('../../../data/chen/processed_tables/chen.read_coverage.tab', 
+chen_coverage_tab = pd.read_csv(data_dir + 'chen/processed_tables/chen.read_coverage.tab', 
                           sep='\t', index_col=0)
-song_coverage_tab = pd.read_csv('../../../data/song/processed_tables/song.read_coverage.tab', 
+song_coverage_tab = pd.read_csv(data_dir + 'song/processed_tables/song.read_coverage.tab', 
                           sep='\t', index_col=0)
-trapnell_coverage_tab = pd.read_csv('../../../data/trapnell/processed_tables/trapnell.read_coverage.tab', 
+trapnell_coverage_tab = pd.read_csv(data_dir + 'trapnell/processed_tables/trapnell.read_coverage.tab', 
                           sep='\t', index_col=0)
-lescroart_coverage_tab = pd.read_csv('../../../data/lescroart/processed_tables/lescroart.read_coverage.tab', 
+lescroart_coverage_tab = pd.read_csv(data_dir + 'lescroart/processed_tables/lescroart.read_coverage.tab', 
                           sep='\t', index_col=0)
-das_coverage_tab = pd.read_csv('../../../data/das/processed_tables/das.read_coverage.tab', 
+das_coverage_tab = pd.read_csv(data_dir + 'das/processed_tables/das.read_coverage.tab', 
                           sep='\t', index_col=0)
-shalek_coverage_tab = pd.read_csv('../../../data/shalek/processed_tables/shalek.read_coverage.tab', 
+shalek_coverage_tab = pd.read_csv(data_dir + 'shalek/processed_tables/shalek.read_coverage.tab', 
                           sep='\t', index_col=0)
 
 
-chen_pca = pd.read_csv('../../../data/chen/chen.pca.tab', sep='\t', index_col=0)
+chen_pca = pd.read_csv(data_dir + 'chen/chen.pca.tab', sep='\t', index_col=0)
 chen_pca = chen_pca.sort_values('pseudotime')
 chen_pca.PC2 = chen_pca.PC2
 chen_pca.line_2 = chen_pca.line_2
@@ -133,7 +134,7 @@ chen_MN = chen_pca.loc[chen_pca.cell_type == 'Motor neuron'].index
 
 ###
 
-song_pca = pd.read_csv('../../../data/song/song.pca_top_fano.tab', sep='\t', index_col=0)
+song_pca = pd.read_csv(data_dir + 'song/song.pca_top_fano.tab', sep='\t', index_col=0)
 song_pca = song_pca.sort_values('pseudotime')
 song_pca.PC2 = -song_pca.PC2
 song_index = [x for x in song_pca.sort_values('pseudotime').index if x in mrna_per_event_song.columns]
@@ -150,7 +151,7 @@ song_MN = song_pca.loc[song_pca.cell_type == 'MN'].index
 
 ###
 
-trapnell_pca = pd.read_csv('../../../data/trapnell/trapnell.pca.tab', sep='\t', index_col=0)
+trapnell_pca = pd.read_csv(data_dir + 'trapnell/trapnell.pca.tab', sep='\t', index_col=0)
 trapnell_pca = trapnell_pca.sort_values('pseudotime')
 trapnell_pca.PC2 = -trapnell_pca.PC2
 trapnell_pca.line_2 = -trapnell_pca.line_2
@@ -170,7 +171,7 @@ trapnell_M72 = trapnell_pca.loc[trapnell_pca.cell_type==72].index
 
 ###
         
-lescroart_pca = pd.read_csv('../../../data/lescroart/lescroart.pca_meta.tab', sep='\t', index_col = 0)
+lescroart_pca = pd.read_csv(data_dir + 'lescroart/lescroart.pca_meta.tab', sep='\t', index_col = 0)
 lescroart_index = [x for x in lescroart_pca.index if x in mrna_per_event_lescroart.columns]
 
 lescroart_pca = lescroart_pca.loc[lescroart_index]
@@ -415,7 +416,7 @@ for cluster in trapnell_pca_clust.groupby('AC')['pseudotime'].mean().sort_values
 
     
     
-das_sra = pd.read_csv('/mnt/c/Users/ferna/Desktop/SingleCell/data/das/SraRunTable.txt', sep='\t', index_col = 6)
+das_sra = pd.read_csv(data_dir + 'das/SraRunTable.txt', sep='\t', index_col = 6)
 das_sra = das_sra.loc[das_PSI.columns]
 das_clust_filter_05 = []
 for cluster in sorted(das_sra.age.unique()):
