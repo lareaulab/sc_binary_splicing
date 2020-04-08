@@ -1,5 +1,5 @@
 from tqdm import tqdm_notebook as tqdm
-current_palette = sns.color_palette('muted')
+current_palette = sns.color_palette('dark')
 from sklearn.metrics import auc
 from scipy.stats.mstats import mannwhitneyu
 from scipy.stats import wilcoxon
@@ -294,7 +294,7 @@ def run_AUC_tests(curves_all, read_filtered, mrna_only_filtered, mrna_filtered):
 
 
 def process_bimodality_dset(PSI_tab, subpop_list, subpop_names, mrna_counts, mrna_per_event, read_counts, coverage_tab, 
-                            dset, psi_min = 0.2, mrna_min = 10, mrna_read_min=0, reads_min = 10, cell_min = 0.5, steps = 0.05):
+                            dset, psi_min = 0.2, mrna_min = 10, mrna_read_min=0, reads_min = 10, cell_min = 0.5, steps = 0.25):
     
     subpop_all = []
     subpop_mrna_filtered = []
@@ -314,9 +314,11 @@ def process_bimodality_dset(PSI_tab, subpop_list, subpop_names, mrna_counts, mrn
 #         mrna_only_selected, mrna_only_filtered = get_curves_dataset(PSI_tab, subpop, mrna_counts, mrna_per_event, read_counts, 
 #                            coverage_tab, psi_min = psi_min, mrna_min = mrna_min, reads_min = 0, cell_min = cell_min, steps=steps,
 #                                                                          filter_cj = False, get_all = False)
-        subpop_all.append(list(curves_all[curves_all.columns[0]]))
-        subpop_mrna_filtered.append(list(mrna_filtered[mrna_filtered.columns[0]]))
-        subpop_read_filtered.append(list(read_filtered[read_filtered.columns[0]]))
+
+        print(curves_all.columns[1])
+        subpop_all.append(list(curves_all[curves_all.columns[1]]))
+        subpop_mrna_filtered.append(list(mrna_filtered[mrna_filtered.columns[1]]))
+        subpop_read_filtered.append(list(read_filtered[read_filtered.columns[1]]))
 
 
     
@@ -328,7 +330,9 @@ def process_bimodality_dset(PSI_tab, subpop_list, subpop_names, mrna_counts, mrn
     
 def plot_bimodality_boxplots_dset(curves_all, read_selected, mrna_selected, subpop_list, subpop_names, dset):
 
-    fig = plt.figure(figsize=(9,6))
+#     fig = plt.figure(figsize=(((9-((4.5/4)*(4-len(curves_all))))/4)*len(curves_all),6))
+
+    fig = plt.figure(figsize=( ( ((4.2*9)/(5*4))*len(curves_all) + (((len(curves_all)-1))) ,4.5)))
     ax  = plt.subplot(1,1,1)
 
     data_a = curves_all
@@ -345,9 +349,12 @@ def plot_bimodality_boxplots_dset(curves_all, read_selected, mrna_selected, subp
 
     # plt.figure()
 
-    bpl = ax.boxplot(data_a, positions=np.array(range(len(data_a)))*7.0-1.5, sym='', widths=0.6, patch_artist=True)
-    bpr = ax.boxplot(data_b, positions=np.array(range(len(data_b)))*7.0, sym='', widths=0.6, patch_artist=True)
-    bpm = ax.boxplot(data_c, positions=np.array(range(len(data_c)))*7.0+1.5, sym='', widths=0.6, patch_artist=True)
+    bpl = ax.boxplot(data_a, positions=np.array(range(len(data_a)))*5.0-1.15, sym='', widths=0.6, patch_artist=True,
+                    boxprops=dict(facecolor=current_palette[4], color=current_palette[4]))
+    bpr = ax.boxplot(data_b, positions=np.array(range(len(data_b)))*5.0, sym='', widths=0.6, patch_artist=True,
+                    boxprops=dict(facecolor='darkred', color='darkred'))
+    bpm = ax.boxplot(data_c, positions=np.array(range(len(data_c)))*5.0+1.15, sym='', widths=0.6, patch_artist=True,
+                    boxprops=dict(facecolor='navy', color='navy'))
 
 
     [x.set_facecolor(current_palette[4]) for x in bpl['boxes']]
@@ -373,7 +380,7 @@ def plot_bimodality_boxplots_dset(curves_all, read_selected, mrna_selected, subp
     plt.ylabel('Percent bimodal cells', fontsize=28)
     plt.title(dset, fontsize=28)
 
-    plt.xticks(np.array(range(len(data_b)))*7.0, subpop_names)
+    plt.xticks(np.array(range(len(data_b)))*5.0, subpop_names)
 #     plt.xticks(range(0, len(curves_all.columns[:-1]) * 7, 14), curves_all.columns[:-1][::2])
     # plt.xlim(-2, len(ticks)*2)
     plt.tight_layout()
@@ -390,9 +397,9 @@ def plot_bimodality_boxplots_dset(curves_all, read_selected, mrna_selected, subp
     plot_name = '_'.join(dset.split())
     
     
-    plt.savefig('plots_review/figure3/bimodality_plots_' + plot_name + '_subpop.svg', bbox_inches='tight')
-    plt.savefig('plots_review/figure3/bimodality_plots_' + plot_name + '_subpop.pdf', bbox_inches='tight')
-    plt.savefig('plots_review/figure3/bimodality_plots_' + plot_name + '_subpop.png', dpi=300, bbox_inches='tight')
+    plt.savefig('plots_review/figure3/bimodality_plots_' + plot_name + '_subpop.svg', bbox_inches='tight', transparent=True)
+    plt.savefig('plots_review/figure3/bimodality_plots_' + plot_name + '_subpop.pdf', bbox_inches='tight', transparent=True)
+    plt.savefig('plots_review/figure3/bimodality_plots_' + plot_name + '_subpop.png', dpi=300, bbox_inches='tight', transparent=True)
     
     
     
@@ -416,9 +423,9 @@ def plot_bimodality_boxplots_dset(curves_all, read_selected, mrna_selected, subp
     ax.yaxis.set_ticks_position('none')
     plt.legend(fontsize=28, frameon=False)
 
-    plt.savefig('plots_review/figure3/bimodality_plots_labels.svg', bbox_inches='tight')
-    plt.savefig('plots_review/figure3/bimodality_plots_labels.pdf', bbox_inches='tight')
-    plt.savefig('plots_review/figure3/bimodality_plots_labels.png', bbox_inches='tight')
+    plt.savefig('plots_review/figure3/bimodality_plots_labels.svg', bbox_inches='tight', transparent=True)
+    plt.savefig('plots_review/figure3/bimodality_plots_labels.pdf', bbox_inches='tight', transparent=True)
+    plt.savefig('plots_review/figure3/bimodality_plots_labels.png', bbox_inches='tight', transparent=True)
     plt.show()
     
     

@@ -707,9 +707,9 @@ def summary_plots(data_out, dset_name,
 #     #plt.legend(frameon=False, fontsize=28)
     plt.xticks([1, 2, 3, 4, 5], ['1', '2', '3', '4', '5'])
     
-    plt.savefig('plots_review/figure3/anova/recall_' + dset_name + '.svg', bbox_inches='tight')
-    plt.savefig('plots_review/figure3/anova/recall_' + dset_name + '.pdf', bbox_inches='tight')
-    plt.savefig('plots_review/figure3/anova/recall_' + dset_name + '.png', dpi=300, bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/recall_' + dset_name + '.svg', bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/recall_' + dset_name + '.pdf', bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/recall_' + dset_name + '.png', dpi=300, bbox_inches='tight')
     
     
     plt.show()
@@ -732,9 +732,9 @@ def summary_plots(data_out, dset_name,
     #plt.legend(frameon=False, fontsize=28)
     plt.xticks([1, 2, 3, 4, 5], ['1', '2', '3', '4', '5'])
     
-    plt.savefig('plots_review/figure3/anova/precision_' + dset_name + '.svg', bbox_inches='tight')
-    plt.savefig('plots_review/figure3/anova/precision_' + dset_name + '.pdf', bbox_inches='tight')
-    plt.savefig('plots_review/figure3/anova/precision_' + dset_name + '.png', dpi=300, bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/precision_' + dset_name + '.svg', bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/precision_' + dset_name + '.pdf', bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/precision_' + dset_name + '.png', dpi=300, bbox_inches='tight')
     
     plt.show()
     
@@ -755,9 +755,9 @@ def summary_plots(data_out, dset_name,
     #plt.legend(frameon=False, fontsize=28)
     plt.xticks([1, 2, 3, 4, 5], ['1', '2', '3', '4', '5'])
     
-    plt.savefig('plots_review/figure3/anova/specificity_' + dset_name + '.svg', bbox_inches='tight')
-    plt.savefig('plots_review/figure3/anova/specificity_' + dset_name + '.pdf', bbox_inches='tight')
-    plt.savefig('plots_review/figure3/anova/specificity_' + dset_name + '.png', dpi=300, bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/specificity_' + dset_name + '.svg', bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/specificity_' + dset_name + '.pdf', bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/specificity_' + dset_name + '.png', dpi=300, bbox_inches='tight')
     
     plt.show()
     
@@ -781,9 +781,9 @@ def summary_plots(data_out, dset_name,
     #plt.legend(frameon=False, fontsize=28)
     plt.xticks([1, 2, 3, 4, 5], ['1', '2', '3', '4', '5'])
     
-    plt.savefig('plots_review/figure3/anova/f1_score_' + dset_name + '.svg', bbox_inches='tight')
-    plt.savefig('plots_review/figure3/anova/f1_score_' + dset_name + '.pdf', bbox_inches='tight')
-    plt.savefig('plots_review/figure3/anova/f1_score_' + dset_name + '.png', dpi=300, bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/f1_score_' + dset_name + '.svg', bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/f1_score_' + dset_name + '.pdf', bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/f1_score_' + dset_name + '.png', dpi=300, bbox_inches='tight')
     
     plt.show()
     
@@ -807,9 +807,9 @@ def summary_plots(data_out, dset_name,
     #plt.legend(frameon=False, fontsize=28)
     plt.xticks([1, 2, 3, 4, 5], ['1', '2', '3', '4', '5'])
     
-    plt.savefig('plots_review/figure3/anova/hrs_' + dset_name + '.svg', bbox_inches='tight')
-    plt.savefig('plots_review/figure3/anova/hrs_' + dset_name + '.pdf', bbox_inches='tight')
-    plt.savefig('plots_review/figure3/anova/hrs_' + dset_name + '.png', dpi=300, bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/hrs_' + dset_name + '.svg', bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/hrs_' + dset_name + '.pdf', bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/hrs_' + dset_name + '.png', dpi=300, bbox_inches='tight')
     
     plt.show()
     
@@ -884,9 +884,9 @@ def summary_plots(data_out, dset_name,
     #plt.legend(frameon=False, fontsize=28)
     plt.xticks([1, 2, 3, 4, 5], ['1', '2', '3', '4', '5'])
     
-    plt.savefig('plots_review/figure3/anova/DOR_' + dset_name + '.svg', bbox_inches='tight')
-    plt.savefig('plots_review/figure3/anova/DOR_' + dset_name + '.pdf', bbox_inches='tight')
-    plt.savefig('plots_review/figure3/anova/DOR_' + dset_name + '.png', dpi=300, bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/DOR_' + dset_name + '.svg', bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/DOR_' + dset_name + '.pdf', bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/DOR_' + dset_name + '.png', dpi=300, bbox_inches='tight')
     
     plt.show()
     
@@ -912,9 +912,9 @@ def summary_plots(data_out, dset_name,
     #plt.legend(frameon=False, fontsize=28)
     plt.xticks([1, 2, 3, 4, 5], ['1', '2', '3', '4', '5'])
     
-    plt.savefig('plots_review/figure3/anova/accuracy_' + dset_name + '.svg', bbox_inches='tight')
-    plt.savefig('plots_review/figure3/anova/accuracy_' + dset_name + '.pdf', bbox_inches='tight')
-    plt.savefig('plots_review/figure3/anova/accuracy_' + dset_name + '.png', dpi=300, bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/accuracy_' + dset_name + '.svg', bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/accuracy_' + dset_name + '.pdf', bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/accuracy_' + dset_name + '.png', dpi=300, bbox_inches='tight')
     
     plt.show()
     
@@ -939,9 +939,9 @@ def summary_plots(data_out, dset_name,
     #plt.legend(frameon=False, fontsize=28)
     plt.xticks([1, 2, 3, 4, 5], ['1', '2', '3', '4', '5'])
     
-    plt.savefig('plots_review/figure3/anova/balanced_accuracy_' + dset_name + '.svg', bbox_inches='tight')
-    plt.savefig('plots_review/figure3/anova/balanced_accuracy_' + dset_name + '.pdf', bbox_inches='tight')
-    plt.savefig('plots_review/figure3/anova/balanced_accuracy_' + dset_name + '.png', dpi=300, bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/balanced_accuracy_' + dset_name + '.svg', bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/balanced_accuracy_' + dset_name + '.pdf', bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/balanced_accuracy_' + dset_name + '.png', dpi=300, bbox_inches='tight')
     
     plt.show()
     
@@ -966,9 +966,9 @@ def summary_plots(data_out, dset_name,
     #plt.legend(frameon=False, fontsize=28)
     plt.xticks([1, 2, 3, 4, 5], ['1', '2', '3', '4', '5'])
     
-    plt.savefig('plots_review/figure3/anova/exon_total_' + dset_name + '.svg', bbox_inches='tight')
-    plt.savefig('plots_review/figure3/anova/exon_total_' + dset_name + '.pdf', bbox_inches='tight')
-    plt.savefig('plots_review/figure3/anova/exon_total_' + dset_name + '.png', dpi=300, bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/exon_total_' + dset_name + '.svg', bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/exon_total_' + dset_name + '.pdf', bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/exon_total_' + dset_name + '.png', dpi=300, bbox_inches='tight')
     
     plt.show()
 
@@ -993,7 +993,7 @@ def summary_plots(data_out, dset_name,
     ax.yaxis.set_ticks_position('none')
     plt.legend(fontsize=28, frameon=False)
 
-    plt.savefig('plots_review/figure3/anova/anova_labels.svg', bbox_inches='tight')
-    plt.savefig('plots_review/figure3/anova/anova_labels.pdf', bbox_inches='tight')
-    plt.savefig('plots_review/figure3/anova/anova_labels.png', bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/anova_labels.svg', bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/anova_labels.pdf', bbox_inches='tight')
+#     plt.savefig('plots_review/figure3/anova/anova_labels.png', bbox_inches='tight')
     plt.show()
