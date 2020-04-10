@@ -142,6 +142,15 @@ def test_anova_filters(PSI_tab, mrna_counts, mrna_per_event, read_counts, covera
     
     aver_all_reads = filter_psi(PSI_tab, int_exons, mrna_per_event, coverage_tab['SJ_coverage'],
               read_counts, 0, read_min, 0)
+    
+    
+    #####
+    
+    
+    
+    #####
+    
+    
 
     joint_idx = [x for x in int_exons if x in aver_all[0].index]
     joint_idx = [x for x in joint_idx if x in aver_all_reads[0].index]
