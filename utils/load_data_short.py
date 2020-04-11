@@ -33,6 +33,7 @@ from sklearn.cluster import AgglomerativeClustering
 mpl.rcParams["mathtext.fontset"] = "stix"
 mpl.rcParams['pdf.fonttype'] = 42
 
+data_dir = '/mnt/c/Users/ferna/Desktop/SingleCell/data/'
 
 # PSI tables
 chen_PSI = pd.read_csv(data_dir + 'chen/processed_tables/chen.skipped_exons_psi.tab', sep='\t', index_col=0)
@@ -40,8 +41,8 @@ song_PSI = pd.read_csv(data_dir + 'song/processed_tables/song.skipped_exons_psi.
 #das_PSI = pd.read_csv(data_dir + 'das/processed_tables/das.skipped_exons_psi.tab', sep='\t',  index_col=0)
 trapnell_PSI = pd.read_csv(data_dir + 'trapnell/processed_tables/trapnell.skipped_exons_psi.tab', 
                     sep='\t',  index_col=0)
-#lescroart_PSI = pd.read_csv(data_dir + 'lescroart/processed_tables/lescroart.skipped_exons_psi.tab', 
-#                     sep='\t',  index_col=0)
+lescroart_PSI = pd.read_csv(data_dir + 'lescroart/processed_tables/lescroart.skipped_exons_psi.tab', 
+                    sep='\t',  index_col=0)
 #shalek_PSI = pd.read_csv(data_dir + 'shalek/processed_tables/shalek.skipped_exons_psi.tab', sep='\t', index_col=0)
 
 # SJ read tables
@@ -50,8 +51,8 @@ song_read_counts = pd.read_csv(data_dir + 'song/processed_tables/song.skipped_ex
 # das_read_counts = pd.read_csv(data_dir + 'das/processed_tables/das.skipped_exons_SJreads.tab', sep='\t',  index_col=0)
 trapnell_read_counts = pd.read_csv(data_dir + 'trapnell/processed_tables/trapnell.skipped_exons_SJreads.tab', 
                             sep='\t', index_col=0)
-# lescroart_read_counts = pd.read_csv(data_dir + 'lescroart/processed_tables/lescroart.skipped_exons_SJreads.tab', 
-#                              sep='\t', index_col=0)
+lescroart_read_counts = pd.read_csv(data_dir + 'lescroart/processed_tables/lescroart.skipped_exons_SJreads.tab', 
+                             sep='\t', index_col=0)
 # shalek_read_counts = pd.read_csv(data_dir + 'shalek/processed_tables/shalek.skipped_exons_SJreads.tab', 
 #                           sep='\t', index_col=0)
 
@@ -73,8 +74,8 @@ song_counts_tab = pd.read_csv(data_dir + 'song/processed_tables/song.rsemCounts.
 #                       sep='\t', index_col=0)
 trapnell_counts_tab = pd.read_csv(data_dir + 'trapnell/processed_tables/trapnell.rsemCounts.gene_symbols.tab', 
                            sep='\t', index_col=0)
-# lescroart_counts_tab = pd.read_csv(data_dir + 'lescroart/processed_tables/lescroart.rsemCounts.gene_symbols.tab', 
-#                             sep='\t', index_col=0)
+lescroart_counts_tab = pd.read_csv(data_dir + 'lescroart/processed_tables/lescroart.rsemCounts.gene_symbols.tab', 
+                            sep='\t', index_col=0)
 # shalek_counts_tab = pd.read_csv(data_dir + 'shalek/processed_tables/shalek.rsemCounts.gene_symbols.tab', 
 #                          sep='\t', index_col=0)
 
@@ -84,8 +85,8 @@ song_mrna_counts = pd.read_csv(data_dir + 'song/processed_tables/song.mrna_count
 # das_mrna_counts = pd.read_csv(data_dir + 'das/processed_tables/das.mrna_counts.tab', sep='\t', index_col=0)
 trapnell_mrna_counts = pd.read_csv(data_dir + 'trapnell/processed_tables/trapnell.mrna_counts.tab', 
                             sep='\t', index_col=0)
-# lescroart_mrna_counts = pd.read_csv(data_dir + 'lescroart/processed_tables/lescroart.mrna_counts.tab', 
-#                              sep='\t', index_col=0)
+lescroart_mrna_counts = pd.read_csv(data_dir + 'lescroart/processed_tables/lescroart.mrna_counts.tab', 
+                             sep='\t', index_col=0)
 # shalek_mrna_counts = pd.read_csv(data_dir + 'shalek/processed_tables/shalek.mrna_counts.tab', 
 #                           sep='\t', index_col=0)
 
@@ -95,8 +96,8 @@ mrna_per_event_song = pd.read_csv(data_dir + 'song/processed_tables/song.mrna_co
 # mrna_per_event_das = pd.read_csv(data_dir + 'das/processed_tables/das.mrna_counts_per_event.tab', sep='\t', index_col=0)
 mrna_per_event_trapnell = pd.read_csv(data_dir + 'trapnell/processed_tables/trapnell.mrna_counts_per_event.tab', 
                             sep='\t', index_col=0)
-# mrna_per_event_lescroart = pd.read_csv(data_dir + 'lescroart/processed_tables/lescroart.mrna_counts_per_event.tab', 
-#                              sep='\t', index_col=0)
+mrna_per_event_lescroart = pd.read_csv(data_dir + 'lescroart/processed_tables/lescroart.mrna_counts_per_event.tab', 
+                             sep='\t', index_col=0)
 # mrna_per_event_shalek = pd.read_csv(data_dir + 'shalek/processed_tables/shalek.mrna_counts_per_event.tab', 
 #                           sep='\t', index_col=0)
 
@@ -107,8 +108,8 @@ song_coverage_tab = pd.read_csv(data_dir + 'song/processed_tables/song.read_cove
                           sep='\t', index_col=0)
 trapnell_coverage_tab = pd.read_csv(data_dir + 'trapnell/processed_tables/trapnell.read_coverage.tab', 
                           sep='\t', index_col=0)
-# lescroart_coverage_tab = pd.read_csv(data_dir + 'lescroart/processed_tables/lescroart.read_coverage.tab', 
-#                           sep='\t', index_col=0)
+lescroart_coverage_tab = pd.read_csv(data_dir + 'lescroart/processed_tables/lescroart.read_coverage.tab', 
+                          sep='\t', index_col=0)
 # das_coverage_tab = pd.read_csv(data_dir + 'das/processed_tables/das.read_coverage.tab', 
 #                           sep='\t', index_col=0)
 # shalek_coverage_tab = pd.read_csv(data_dir + 'shalek/processed_tables/shalek.read_coverage.tab', 
@@ -171,17 +172,17 @@ trapnell_M72 = trapnell_pca.loc[trapnell_pca.cell_type==72].index
 
 ###
         
-# lescroart_pca = pd.read_csv(data_dir + 'lescroart/lescroart.pca_meta.tab', sep='\t', index_col = 0)
-# lescroart_index = [x for x in lescroart_pca.index if x in mrna_per_event_lescroart.columns]
+lescroart_pca = pd.read_csv(data_dir + 'lescroart/lescroart.pca_meta.tab', sep='\t', index_col = 0)
+lescroart_index = [x for x in lescroart_pca.index if x in mrna_per_event_lescroart.columns]
 
-# lescroart_pca = lescroart_pca.loc[lescroart_index]
-# lescroart_PSI = lescroart_PSI[lescroart_index]
-# mrna_per_event_lescroart = mrna_per_event_lescroart[lescroart_index]
-# lescroart_read_counts = lescroart_read_counts[lescroart_index]
-# lescroart_coverage_tab = lescroart_coverage_tab.loc[lescroart_index]
+lescroart_pca = lescroart_pca.loc[lescroart_index]
+lescroart_PSI = lescroart_PSI[lescroart_index]
+mrna_per_event_lescroart = mrna_per_event_lescroart[lescroart_index]
+lescroart_read_counts = lescroart_read_counts[lescroart_index]
+lescroart_coverage_tab = lescroart_coverage_tab.loc[lescroart_index]
 
-# lescroart_E6 = lescroart_pca.loc[lescroart_pca.cell_type=='E6.75'].index
-# lescroart_E7 = lescroart_pca.loc[lescroart_pca.cell_type=='E7.25'].index
+lescroart_E6 = lescroart_pca.loc[lescroart_pca.cell_type=='E6.75'].index
+lescroart_E7 = lescroart_pca.loc[lescroart_pca.cell_type=='E7.25'].index
 
 def process_subpop(subpop, psi, mrna, mrna_per_event, reads, cj, psi_min = 0.2, mrna_min=10, reads_min = 0, cell_min = 0.5, nbins=11,
                   filter_cj = True):
@@ -253,26 +254,26 @@ for cluster in song_pca_clust.groupby('AC')['pseudotime'].mean().sort_values().i
     
     
 ###################
-# # Lescroart
-# ac = AgglomerativeClustering(n_clusters=3)
-# ac_clusters = ac.fit_predict(lescroart_pca[['PC1', 'PC2']])
+# Lescroart
+ac = AgglomerativeClustering(n_clusters=3)
+ac_clusters = ac.fit_predict(lescroart_pca[['PC1', 'PC2']])
 
-# # figsize(6,4)
-# # plt.scatter(lescroart_pca.PC1, lescroart_pca.PC2, c=ac_clusters)
-# # plt.show()
+# figsize(6,4)
+# plt.scatter(lescroart_pca.PC1, lescroart_pca.PC2, c=ac_clusters)
+# plt.show()
 
-# lescroart_pca_clust = lescroart_pca.copy()
-# lescroart_pca_clust['AC'] = ac_clusters
+lescroart_pca_clust = lescroart_pca.copy()
+lescroart_pca_clust['AC'] = ac_clusters
 
 
-# lescroart_clust_filter = []
-# for cluster in lescroart_pca_clust.cell_type.unique():
-#     clust_subpop = lescroart_pca_clust.index[lescroart_pca_clust.cell_type == cluster]
+lescroart_clust_filter = []
+for cluster in lescroart_pca_clust.cell_type.unique():
+    clust_subpop = lescroart_pca_clust.index[lescroart_pca_clust.cell_type == cluster]
     
-#     lescroart_filter = process_subpop(clust_subpop, lescroart_PSI, lescroart_mrna_counts, mrna_per_event_lescroart, 
-#                                  lescroart_read_counts, lescroart_coverage_tab['SJ_coverage'], 0.1, 10, 0, cell_min=0.5)
+    lescroart_filter = process_subpop(clust_subpop, lescroart_PSI, lescroart_mrna_counts, mrna_per_event_lescroart, 
+                                 lescroart_read_counts, lescroart_coverage_tab['SJ_coverage'], 0.1, 10, 0, cell_min=0.5)
     
-#     lescroart_clust_filter.append(lescroart_filter)
+    lescroart_clust_filter.append(lescroart_filter)
     
     
 ###################
@@ -372,22 +373,22 @@ for cluster in song_pca_clust.groupby('AC')['pseudotime'].mean().sort_values().i
     
     
 ###################
-# # Lescroart
-# ac = AgglomerativeClustering(n_clusters=3)
-# ac_clusters = ac.fit_predict(lescroart_pca[['PC1', 'PC2']])
+# Lescroart
+ac = AgglomerativeClustering(n_clusters=3)
+ac_clusters = ac.fit_predict(lescroart_pca[['PC1', 'PC2']])
 
-# # figsize(6,4)
-# # plt.scatter(lescroart_pca.PC1, lescroart_pca.PC2, c=ac_clusters)
-# # plt.show()
+# figsize(6,4)
+# plt.scatter(lescroart_pca.PC1, lescroart_pca.PC2, c=ac_clusters)
+# plt.show()
 
-# lescroart_clust_filter_05 = []
-# for cluster in lescroart_pca_clust.cell_type.unique():
-#     clust_subpop = lescroart_pca_clust.index[lescroart_pca_clust.cell_type == cluster]
+lescroart_clust_filter_05 = []
+for cluster in lescroart_pca_clust.cell_type.unique():
+    clust_subpop = lescroart_pca_clust.index[lescroart_pca_clust.cell_type == cluster]
     
-#     lescroart_filter = process_subpop(clust_subpop, lescroart_PSI, lescroart_mrna_counts, mrna_per_event_lescroart, 
-#                                  lescroart_read_counts, lescroart_coverage_tab['SJ_coverage'], 0.05, 10, 0, cell_min=0.5)
+    lescroart_filter = process_subpop(clust_subpop, lescroart_PSI, lescroart_mrna_counts, mrna_per_event_lescroart, 
+                                 lescroart_read_counts, lescroart_coverage_tab['SJ_coverage'], 0.05, 10, 0, cell_min=0.5)
     
-#     lescroart_clust_filter_05.append(lescroart_filter)
+    lescroart_clust_filter_05.append(lescroart_filter)
     
     
     
