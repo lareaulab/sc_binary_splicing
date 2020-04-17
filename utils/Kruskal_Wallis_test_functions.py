@@ -3,30 +3,38 @@ current_palette = sns.color_palette('muted')
 from scipy.stats import friedmanchisquare
 from scipy.stats import zscore
 from tqdm import tqdm_notebook as tqdm
+from scipy.special import logit
 
+##########
 def hyper_test(M, n, N, k):
-    # Input:
-    # M: Population size (total exons tested)
-    # n: Successess in population (exons with p-value <= x)
-    # N: Sample size (exons selected)
-    # k: Successes in sample (selected exons with p-value <= x)
+    '''
+    Calculates the hypergeometric test.
     
-    # Output:
-    # p_depleted: p-value of depletion from the hypergeometric test
-    # p_enriched: p-value of enrichment from the hypergeometric test
-    
+    Input:
+      M: Population size (total exons tested)
+      n: Successess in population (exons with p-value <= x)
+      N: Sample size (exons selected)
+      k: Successes in sample (selected exons with p-value <= x)
+    Output:
+      p_depleted: p-value of depletion from the hypergeometric test
+      p_enriched: p-value of enrichment from the hypergeometric test
+    '''
     hpd = hypergeom(M, n, N) # Hypergeometric distribution
     p_depleted = hpd.cdf(k)  # Get cummulative distribution up to k
     p_enriched = hpd.sf(k-1) # Survival function up to k-1 (1 - cdf(k-1))
     return p_depleted, p_enriched
     
-from scipy.special import logit
     
+##########
 def linearize_psi(sample):
-    # This function calculated the logit of PSI, but caps at 0.01 and 0.99
-    # sample: a list of PSI values
-    # linear_sample: logit of the PSI
+    '''
+    Calculates the logit of PSI, but caps at 0.01 and 0.99
     
+    Input:
+      sample: a list of PSI values
+    Output:
+      linear_sample: logit of the PSI
+    '''
     linear_sample = []
     for x in sample:
         if x >= 0.99:
@@ -37,15 +45,23 @@ def linearize_psi(sample):
             linear_sample.append(logit(x))
     return linear_sample
     
-def run_anova(samples, linearize = False):
-    # This function is necessary because for some reason, the Python implementation of the
-    # Kruskal-Wallis test can take mutiple observations, but not as an array, thus I have to resort
-    # to this function to test different number of clusters.
     
-    # samples: list of list of PSI observations
-    # returns Kruskal-Wallis test results over the list of lists
+##########
+def run_anova(samples, linearize = False):
+    '''
+    Runs the Kruskal-Wallis analysis of variance for data between 2 up to 6 clusters.
+    This function is necessary because for some reason, the Python implementation of the
+    Kruskal-Wallis test can take mutiple observations, but not as an array, thus I have 
+    to resort to this function to test different number of clusters.
+    
+    Input:
+      samples: list of list of PSI observations
+    Output:
+      returns Kruskal-Wallis test results over the list of lists
+    '''
     
     if linearize:
+        samples = [linearize_psi(x) for x in samples]
         samples = [x - np.mean(x) for x in samples]
         
     if len(samples) == 2:
@@ -61,17 +77,23 @@ def run_anova(samples, linearize = False):
     
 
 def test_exon_bimodal_anova(PSI_tab, exon, pca_clust, clusters = 'AC', obs_min=0.5, linearize=False):
-    # Run Kruskal-Wallis test for one exon
-    # Input
-    # PSI_tab: Matrix of PSI
-    # exon: name of the exon to test
-    # pca_clust: metadata dataframe with cluster information
-    # clusters: column of pca_clust with cluster information
-    # obs_min: minimum % of cells in cluster that have an observation to run the test (default: 50%)
-    # linearize: if calculate logit of the PSI (default: False)
+    '''
+    Run Kruskal-Wallis test for one exon, to get significance in the differences 
+    in PSI between multiple clusters. 
+    
+    Input
+      PSI_tab: Matrix of PSI
+      exon: name of the exon to test
+      pca_clust: metadata dataframe with cluster information
+      clusters: column of pca_clust with cluster information
+      obs_min: minimum % of cells in cluster that have an observation to run the test (default: 50%)
+      linearize: if calculate logit of the PSI (default: False)
+    Output:
+      anova_p: p-value of the KW test on the input exon
+      10: vestigial. Downstream code expects two outputs
+    '''
     
     obs_cells = PSI_tab.loc[exon].dropna().index # select cells that have a PSI observation
-    
     cluster_psi = [] # list of lists of PSI observations per cluster
     
     for i in pca_clust[clusters].unique(): # iterate through each cluster
@@ -91,6 +113,23 @@ def test_exon_bimodal_anova(PSI_tab, exon, pca_clust, clusters = 'AC', obs_min=0
 
 def cluster_anova_test(PSI_tab, pca_clust, clusters, correction = 'fdr_bh', 
                           correct_multitest = True, obs_min = 0.5, linearize=False):
+    '''
+    Runs the Kruskal-Wallis test for a PSI matrix, and a given set of clusters.
+    It wraps the test_exon_bimodal_anova function for all exons.
+    
+    Input
+      PSI_tab: Matrix of PSI
+      pca_clust: metadata dataframe with cluster information
+      clusters: column of pca_clust with cluster information
+      correction: vestigial; used to include an option to correct p-values
+      correct_multitest: vestigial. p-values are not corrected anymore, because the significance of
+                         individual exons is not the focus of this test.
+      obs_min: minimum % of cells in cluster that have an observation to run the test 
+               (default: 50%; for three clusters min)
+      linearize: if calculate logit of the PSI (default: False)
+    Output
+      cluster_df: dataframe with p-values for each exon that meets the observed minimum
+    '''
     cluster_array = []
     pvals = []
     exon_pass = []
@@ -111,7 +150,6 @@ def cluster_anova_test(PSI_tab, pca_clust, clusters, correction = 'fdr_bh',
         
     print('not pass: '+str(not_pass))
     print('tested exons: ' + str(len(pvals)))
-#     print(not_pass)
     figsize(4, 4)
     plt.hist(pvals)
     plt.xlabel('p-value')
@@ -126,8 +164,39 @@ def cluster_anova_test(PSI_tab, pca_clust, clusters, correction = 'fdr_bh',
 
 
 def test_anova_filters(PSI_tab, mrna_counts, mrna_per_event, read_counts, coverage_tab, pca_clust, clusters = 'AC',
-                     psi_min = 0.2, obs_min = 0.5, mrna_min = 10, mrna_read_min=10, read_min = 10, filter_obs = False, 
+                     psi_min = 0.2, obs_min = 0.5, mrna_min = 10, mrna_read_min=0, read_min = 10, filter_obs = False, 
                     dset_name = '', correct_multitest = False, linearize=False):
+    '''
+    Wrapper function that manages the run of the Kruskal-Wallis test in the dataset, in addition to
+    running basic filtering and exon selection functions. At the moment of writing this note, many parts 
+    of the code are vestigial and will be removed.
+    
+    Input:
+      PSI_tab: Matrix of PSI
+      mrna_counts: matrix of mRNA molecules per gene
+      mrna_per_event: mrna_counts with PSI_tab index; extended for multiple exons per gene
+      read_counts: SJ counts used to estimate observations in PSI_tab
+      coverage_tab: splice junction coverage rate
+      pca_clust: metadata matrix with cluster information for cells
+      clusters: column in pca_clust with clusters (default AC, but cell_type can also be used)
+      psi_min: consider only exons with PSI average between [psi_min, 1-psi_min]
+      obs_min: minimum % of cells in cluster that have an observation to run the test 
+               (default: 50%; for three clusters min)
+      mrna_min: minimum number of mRNAs in a quality observation (default 10)
+      mrna_read_min: set an additional baseline minimum of reads for the mRNA filter (default 0)
+      read_min: flat minimum of informative reads per event for the read filter (default 10)
+      filter_obs: vestigial; should not be run as True
+      dset_name: vestigial; this function used to make plots as well
+      correct_multitest: vestigial
+      linearize: whether if linearize the PSI before running KW test. We've found that it has
+                 very little effect in the results.
+    Output
+      change_tab: table with KW p-values for exons with minimum observations
+      mrna_selected: set of exons that pass the mRNA filter
+      mrna_only_selected: vestigial; set of exons that pass the 10 mRNA in gene minimum, but not
+                          necessarily the minimum reads expected for 10 mRNAs
+      read_selected: set of exons that pass the flat-read minimum filter
+    '''
     
     observed = PSI_tab.loc[PSI_tab.isna().mean(axis=1) <= (1-obs_min)].index
     int_genes, int_exons = spu.get_int_events(PSI_tab.loc[observed], mrna_counts, psi_min)
@@ -175,6 +244,11 @@ def test_anova_filters(PSI_tab, mrna_counts, mrna_per_event, read_counts, covera
     
     return change_tab, mrna_selected, mrna_only_selected, read_selected
 
+
+###########
+###########
+# The following functions run a similar test, but using Spearman correlation with pseudotime
+# It is currently not used for anything related to the Buen Abad Najar et al., 2019 pre-print.
 
 def test_exon_bimodal_spearman(PSI_tab, exon, obs_min, pca_clust, clusters = 'AC', one_test = False, linearize=False):
     
@@ -315,11 +389,18 @@ def test_spearman_filters(PSI_tab, mrna_counts, mrna_per_event, read_counts, cov
 
 def get_statistics(pvals, selected_exons, x, beta):
     '''
+    Get several summary calculations to evaluate the performance of an exon selection
+    approach. These are inspired in machine learning classifier methods. 
+    
+    It basically treats the exon selection approach as a classifier that predicts
+    exons with significant splicing changes. The true instances are based in a minimum
+    p-value cutoff x. We set:
+    
     For a given p-value cutoff x: 
     — The set of “True instances” X1 is all exons with p-value <= x
     — The set of “False instances” X2 is all exons with p-value > x
-    — The set of “Positive calls”  X3 is all exons that you keep after filtering
-    — The set of “Negative calls”  X4 is all exons that you throw out after filtering
+    — The set of “Positive calls”  X3 is all exons selected by the filter
+    — The set of “Negative calls”  X4 is all exons rejected by the filter
 
     TP = X1 AND X3
     TN = X2 AND X4
