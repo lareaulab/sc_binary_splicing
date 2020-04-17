@@ -315,10 +315,10 @@ def process_bimodality_dset(PSI_tab, subpop_list, subpop_names, mrna_counts, mrn
 #                            coverage_tab, psi_min = psi_min, mrna_min = mrna_min, reads_min = 0, cell_min = cell_min, steps=steps,
 #                                                                          filter_cj = False, get_all = False)
 
-        print(curves_all.columns[1])
-        subpop_all.append(list(curves_all[curves_all.columns[1]]))
-        subpop_mrna_filtered.append(list(mrna_filtered[mrna_filtered.columns[1]]))
-        subpop_read_filtered.append(list(read_filtered[read_filtered.columns[1]]))
+#         print(curves_all.columns[0])
+        subpop_all.append(list(curves_all[curves_all.columns[0]]))
+        subpop_mrna_filtered.append(list(mrna_filtered[mrna_filtered.columns[0]]))
+        subpop_read_filtered.append(list(read_filtered[read_filtered.columns[0]]))
 
 
     

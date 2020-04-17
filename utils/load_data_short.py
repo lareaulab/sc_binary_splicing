@@ -45,6 +45,26 @@ lescroart_PSI = pd.read_csv(data_dir + 'lescroart/processed_tables/lescroart.ski
                     sep='\t',  index_col=0)
 #shalek_PSI = pd.read_csv(data_dir + 'shalek/processed_tables/shalek.skipped_exons_psi.tab', sep='\t', index_col=0)
 
+
+
+# #I tabs
+# chen_I = pd.read_csv(data_dir + 'chen/chen_Icounts.tab', sep='\t', index_col=0)
+# lescroart_I = pd.read_csv(data_dir + 'lescroart/lescroart_Icounts.tab', sep='\t', index_col=0)
+# trapnell_I = pd.read_csv(data_dir + 'trapnell/trapnell_Icounts.tab', sep='\t', index_col=0)
+# song_I = pd.read_csv(data_dir + 'song/song_Icounts.tab', sep='\t', index_col=0)
+# # das_I = pd.read_csv(data_dir + 'das/das_Icounts.tab', sep='\t', index_col=0)
+# # shalek_I = pd.read_csv(data_dir + 'shalek/shalek_Icounts.tab', sep='\t', index_col=0)
+
+
+# chen_PSI = chen_PSI.loc[(chen_I.mean(axis=1)/(chen_PSI > 0).mean(axis=1)) >= 0.1]
+# lescroart_PSI = lescroart_PSI.loc[(lescroart_I.mean(axis=1)/(lescroart_PSI > 0).mean(axis=1)) >= 0.1]
+# trapnell_PSI = trapnell_PSI.loc[(trapnell_I.mean(axis=1)/(trapnell_PSI > 0).mean(axis=1)) >= 0.1]
+# song_PSI = song_PSI.loc[(song_I.mean(axis=1)/(song_PSI > 0).mean(axis=1)) >= 0.1]
+# # das_PSI = das_PSI.loc[(das_I.mean(axis=1)/(das_PSI > 0).mean(axis=1)) >= 0.1]
+# # shalek_PSI = shalek_PSI.loc[(shalek_I.mean(axis=1)/(shalek_PSI > 0).mean(axis=1)) >= 0.1]
+
+
+
 # SJ read tables
 chen_read_counts = pd.read_csv(data_dir + 'chen/processed_tables/chen.skipped_exons_SJreads.tab', sep='\t', index_col=0)
 song_read_counts = pd.read_csv(data_dir + 'song/processed_tables/song.skipped_exons_SJreads.tab', sep='\t', index_col=0)
