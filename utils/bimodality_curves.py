@@ -49,10 +49,16 @@ def get_curves_dataset(PSI_tab, subpop, mrna_counts, mrna_per_event, read_counts
     else:
         return bimodality_curves_selected, bimodality_curves_filtered
         
-        
-        
-def plot_bimodality_curves(curva_set, color_list, nameset, 
-                            title, alpha_list = '', plot_individual_events = False):
+
+def plot_curves_dset(ax, PSI_tab, subpop, mrna_counts, mrna_per_event, read_counts, coverage_tab, reads_min = 0, 
+                     alpha_list=[0.075, 0.2]):
+
+    exon_all, exon_mrna, exon_mrna_filtered = get_curves_dataset(PSI_tab, subpop, mrna_counts, mrna_per_event, 
+                                                                 read_counts, coverage_tab, reads_min = reads_min, steps = 0.05)
+    plot_bimodality_curves(ax, [exon_all, exon_mrna_filtered], ['darkred', 'navy'], ['all', 'filtered'], alpha_list)
+
+
+def plot_bimodality_curves(ax, curva_set, color_list, nameset, alpha_list = ''):
     
     if len(alpha_list) == 0:
         alpha_list = [0.5]*len(curva_set)
@@ -67,48 +73,20 @@ def plot_bimodality_curves(curva_set, color_list, nameset,
         
         for exon in bimodality_curve.index:
             curva = list(bimodality_curve.loc[exon])
-            plt.plot([0]+x_lims, [0]+list(curva), c=col, alpha=alph,)
+            ax.plot(x_lims, list(curva), c=col, alpha=alph,)
             
-    plt.title(title)
-    plt.xlabel('$\Psi$ cutoff')
-    plt.ylabel('proportion of cells below cutoff')
+
+    ax.set_xlabel('$\Psi$ cutoff', fontsize=28)
+    ax.spines["right"].set_visible(False)
+    ax.spines["top"].set_visible(False)
+    ax.tick_params(labelsize=28, length=5)
 
     colors = color_list
     lines = [Line2D([0], [0], color=c, linewidth=3) for c in colors]
     labels = nameset
-    plt.legend(lines, labels, loc='lower right', frameon=False)
-
-    plt.show()
-    
-# def plot_bimodality_box(curva_set, color_list, nameset, 
-#                             title, alpha_list = '', plot_individual_events = False):
-    
-#     if len(alpha_list) == 0:
-#         alpha_list = [0.5]*len(curva_set)
-    
-#     for i in range(len(curva_set)):
-        
-#         bimodality_curve = curva_set[i]
-#         col = color_list[i]
-#         alph = alpha_list[i]
-#         x_lims = [float(x) for x in bimodality_curve.columns]
         
         
-#         for exon in bimodality_curve.index:
-#             curva = list(bimodality_curve.loc[exon])
-#             plt.plot([0]+x_lims, [0]+list(curva), c=col, alpha=alph,)
-            
-#     plt.title(title)
-#     plt.xlabel('$\Psi$ cutoff')
-#     plt.ylabel('proportion of cells below cutoff')
-
-#     colors = color_list
-#     lines = [Line2D([0], [0], color=c, linewidth=3) for c in colors]
-#     labels = nameset
-#     plt.legend(lines, labels, loc='lower right', frameon=False)
-
-#     plt.show()
-    
+        
 def process_bimodality(PSI_tab, subpop, mrna_counts, mrna_per_event, read_counts, coverage_tab, dset, psi_min = 0.2, 
                        mrna_min = 10, reads_min = 10, cell_min = 0.5, steps = 0.05):
     

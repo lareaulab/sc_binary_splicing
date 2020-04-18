@@ -54,10 +54,6 @@ def plot_pca(pca_tab, psi_tab, mrna_tab, reads_tab, cj, event, mrna_min, plot_di
     cb.ax.tick_params(labelsize=28, length=5)
     cb.outline.set_visible(False)
     
-    
-    
-    
-    ax.plot(pca_tab.line_1, pca_tab.line_2, c='red',linewidth=2)
 
     #plt.plot(chen_pca.line_1, -chen_pca.line_2, c='red',linewidth=3, label='lineage')
     
