@@ -443,3 +443,30 @@ for cluster in sorted(das_sra.age.unique()):
                                  das_read_counts, das_coverage_tab['SJ_coverage'], 0.1, 10, 0, cell_min=0.5)
     
     das_clust_filter_05.append(das_filter)
+    
+    
+    
+    
+# chen_norm_counts = pd.read_csv(data_dir + 'chen/chen.norm_counts_extended.tab', sep='\t', index_col = 0)
+# chen_norm_counts = chen_norm_counts[chen_PSI.columns]
+
+# ac = AgglomerativeClustering(n_clusters=5)
+# ac_clusters = ac.fit_predict(chen_norm_counts.T)
+# chen_pca_clust = chen_pca.copy()
+# chen_pca_clust['AC'] = ac_clusters
+
+# song_norm_counts = pd.read_csv(data_dir + 'song/song.norm_counts.tab', sep='\t', index_col = 0)
+# song_norm_counts = song_norm_counts[song_PSI.columns]
+
+# ac = AgglomerativeClustering(n_clusters=3)
+# ac_clusters = ac.fit_predict(song_norm_counts.T)
+# song_pca_clust = song_pca.copy()
+# song_pca_clust['AC'] = ac_clusters
+
+# trapnell_norm_counts = pd.read_csv(data_dir + 'trapnell/trapnell.norm_counts.tab', sep='\t', index_col = 0)
+# trapnell_norm_counts = trapnell_norm_counts[trapnell_PSI.columns]
+
+# ac = AgglomerativeClustering(n_clusters=4)
+# ac_clusters = ac.fit_predict(trapnell_norm_counts.T)
+# trapnell_pca_clust = trapnell_pca.copy()
+# trapnell_pca_clust['AC'] = ac_clusters
