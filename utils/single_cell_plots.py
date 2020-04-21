@@ -21,7 +21,7 @@ mpl.rcParams["mathtext.fontset"] = "stix"
 
 
 def plot_pca(pca_tab, psi_tab, mrna_tab, reads_tab, cj, event, mrna_min, plot_dir, cmap='viridis', 
-             filter_cells=True, print_pseudotime=False, vmin=0, vmax=1):
+             filter_cells=True, print_pseudotime=False, vmin=0, vmax=1, alpha_missing=0.2, width = 8.5):
     
 #     figsize(10,8)
     
@@ -37,10 +37,10 @@ def plot_pca(pca_tab, psi_tab, mrna_tab, reads_tab, cj, event, mrna_min, plot_di
         pass_cells = psi_tab.columns[(mrna_tab.loc[event] > -1) & (reads_tab.loc[event] >= -1)]
 
 
-    figsize(8, 5)
+    figsize(width, 5)
     fig = plt.figure()
     ax  = plt.subplot(1,1,1)
-    ax.scatter(pca_tab.PC1, pca_tab.PC2, c='gray', s=75, edgecolors='none', alpha=0.1)
+    ax.scatter(pca_tab.PC1, pca_tab.PC2, c='gray', s=75, edgecolors='none', alpha=alpha_missing)
     sc = ax.scatter(pca_tab.loc[pass_cells, 'PC1'], pca_tab.loc[pass_cells, 'PC2'], 
                 c=psi_tab.loc[event, pass_cells], s=100, edgecolors='none', vmin=vmin, vmax=vmax, cmap=cmap)
     
