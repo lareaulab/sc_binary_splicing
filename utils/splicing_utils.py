@@ -135,12 +135,39 @@ def process_symsim_true(table_name, n=500, g=1500):
     return counts, psi
 
 def process_symsim_observed(table_name, gene_len, n=500, g=1500, read_len=50):
+    r.seed(0)
     
     gene_len_i = gene_len[:g]
     gene_len_e = gene_len[g:]
     
+#     b_i = (4*(read_len-1))/gene_len_i
+#     b_e = (2*(read_len-1))/gene_len_e
+    
+#     biases_i = []
+#     for i in b_i:
+#         b = np.max([r.normal(i, 0.1, 1)[0], 0.001])
+#         b = np.min([b, 0.99])
+#         biases_i.append(b)
+        
+#     biases_e = []
+#     for e in b_e:
+#         b = np.max([r.normal(e, 0.1, 1)[0], 0.001])
+#         b = np.min([b, 0.999])
+#         biases_e.append(b)
+        
+        
+#     biases_i = np.array(biases_i)
+#     biases_e = np.array(biases_e)
+
+# ###
+    
     biases_i = (4*(read_len-1))/gene_len_i
     biases_e = (2*(read_len-1))/gene_len_e
+
+#     plt.hist(biases_e)
+#     plt.show()
+#     plt.hist(biases_i)
+#     plt.show()
     
     tabla = pd.read_csv(table_name, sep='\t', names = ['cell_' + str(i) for i in range(1, n+1)])
     
