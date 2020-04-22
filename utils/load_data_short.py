@@ -177,6 +177,9 @@ trapnell_pca = trapnell_pca.sort_values('pseudotime')
 trapnell_pca.PC2 = -trapnell_pca.PC2
 trapnell_pca.line_2 = -trapnell_pca.line_2
 trapnell_index = [x for x in trapnell_pca.sort_values('pseudotime').index if x in mrna_per_event_trapnell.columns]
+#trapnell_min_mrna = trapnell_mrna_counts.columns[trapnell_mrna_counts.sum() >= 10000] #this is the only dataset for which this is required
+# trapnell_min_mrna = trapnell_mrna_counts.columns[trapnell_mrna_counts.sum() >= trapnell_mrna_counts.sum().quantile(0.25)]
+# trapnell_index = [x for x in trapnell_index if x in trapnell_min_mrna]
 
 trapnell_pca = trapnell_pca.loc[trapnell_index]
 trapnell_PSI = trapnell_PSI[trapnell_index]

@@ -720,15 +720,15 @@ def get_enrichment(test_data):
         mrna_only_pvals.append(hyper_test(enrich[3], enrich[4], enrich[7], enrich[8])[1])
         mrna_pvals.append(hyper_test(enrich[3], enrich[4], enrich[9], enrich[10])[1])
         
-#     read_padj = multipletests(read_pvals, method='fdr_bh')[1]
-#     mrna_only_padj = multipletests(mrna_only_pvals, method='fdr_bh')[1]
-#     mrna_padj = multipletests(mrna_pvals, method='fdr_bh')[1]
+    read_padj = multipletests(read_pvals, method='fdr_bh')[1]
+    mrna_only_padj = multipletests(mrna_only_pvals, method='fdr_bh')[1]
+    mrna_padj = multipletests(mrna_pvals, method='fdr_bh')[1]
 
-    corrected = multipletests(read_pvals + mrna_pvals, method='fdr_bh')[1]
-    read_padj = corrected[:len(p_limits)]
-#     mrna_only_padj = corrected[len(p_limits):2*len(p_limits)]
-    mrna_only_padj = corrected[len(p_limits):]
-    mrna_padj = corrected[len(p_limits):]
+#     corrected = multipletests(read_pvals + mrna_pvals, method='fdr_bh')[1]
+#     read_padj = corrected[:len(p_limits)]
+# #     mrna_only_padj = corrected[len(p_limits):2*len(p_limits)]
+#     mrna_only_padj = corrected[len(p_limits):]
+#     mrna_padj = corrected[len(p_limits):]
         
     return read_enrichment, mrna_only_enrichment, mrna_enrichment, read_padj, mrna_only_padj, mrna_padj
 
