@@ -394,7 +394,7 @@ for exon in int_exons:
 
 print('')
 print('Shuffling exons') 
-chen_mock_dict, mdf = get_mock_dict(chen_PSI.loc[test_exons], chen_norm_PSI.loc[test_exons], W_chen, mock=200000)
+chen_mock_dict, mdf = get_mock_dict(chen_PSI.loc[test_exons], chen_norm_PSI.loc[test_exons], W_chen, mock=1000000)
 mdf.to_csv('autocorrelation_results/chen.mock_data.tab', sep='\t', header=True, index=True)
 
 pgamma_chen = get_C_score_pval_gamma(chen_PSI.loc[test_exons], chen_norm_PSI.loc[test_exons], 
