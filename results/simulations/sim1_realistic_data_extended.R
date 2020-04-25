@@ -37,7 +37,7 @@ for (i in 1:1500) {
 
 mrna_matrix <- rbind(I_matrix, E_matrix)
 
-observed_reads_2 <- True2ObservedCounts(true_counts=mrna_matrix, meta_cell=mrna[[3]], protocol="nonUMI", alpha_mean=0.2,
+observed_reads_2 <- True2ObservedCounts(true_counts=mrna_matrix, meta_cell=mrna[[3]], protocol="nonUMI", alpha_mean=0.25,
 					alpha_sd=0.002, gene_len=gene_len, depth_mean=1e5, depth_sd=3e4, lenslope=0.01)
 
 observed_reads_1 <- True2ObservedCounts(true_counts=mrna_matrix, meta_cell=mrna[[3]], protocol="nonUMI", alpha_mean=0.1, 
@@ -85,7 +85,7 @@ for (i in 1:1500) {
 
 mrna_matrix <- rbind(I_matrix, E_matrix)
 
-observed_reads_2 <- True2ObservedCounts(true_counts=mrna_matrix, meta_cell=mrna[[3]], protocol="nonUMI", alpha_mean=0.2,
+observed_reads_2 <- True2ObservedCounts(true_counts=mrna_matrix, meta_cell=mrna[[3]], protocol="nonUMI", alpha_mean=0.25,
 					alpha_sd=0.002, gene_len=gene_len, depth_mean=1e5, depth_sd=3e4, lenslope=0.01)
 
 observed_reads_1 <- True2ObservedCounts(true_counts=mrna_matrix, meta_cell=mrna[[3]], protocol="nonUMI", alpha_mean=0.1, 
