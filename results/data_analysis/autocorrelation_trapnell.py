@@ -387,7 +387,7 @@ for exon in int_exons:
         
 print('')
 print('Shuffling exons')
-trapnell_mock_dict, mdf = get_mock_dict(trapnell_PSI.loc[test_exons], trapnell_norm_PSI.loc[test_exons], W_trapnell, mock=200000)
+trapnell_mock_dict, mdf = get_mock_dict(trapnell_PSI.loc[test_exons], trapnell_norm_PSI.loc[test_exons], W_trapnell, mock=1000000)
 mdf.to_csv('autocorrelation_results/trapnell.mock_data.tab', sep='\t', header=True, index=True)
 
 print('')

@@ -384,7 +384,7 @@ test_exons = [x for x in observed_exons if x in int_exons]
 
 print('')
 print('Shuffling exons')
-song_mock_dict, mdf = get_mock_dict(song_PSI.loc[test_exons], song_norm_PSI.loc[test_exons], W_song, mock=200000)
+song_mock_dict, mdf = get_mock_dict(song_PSI.loc[test_exons], song_norm_PSI.loc[test_exons], W_song, mock=1000000)
 mdf.to_csv('autocorrelation_results/song.mock_data.tab', sep='\t', header=True, index=True)
 
 pgamma_song = get_C_score_pval_gamma(song_PSI.loc[test_exons], song_norm_PSI.loc[test_exons], 
