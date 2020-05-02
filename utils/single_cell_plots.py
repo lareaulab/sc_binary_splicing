@@ -363,7 +363,7 @@ def plot_cell_expression_v_binary(PSI_table, total_counts, dset_name, save_name,
         rpos_min = np.log10(np.array(counts_mean)).min()
         r_pos = rpos_min + 0.1*(rpos_max - rpos_min)
     
-    ax_joint.text(r_pos, 0.2, 'R = '+str(round(pr,3)), fontsize=28, verticalalignment='top')
+    ax_joint.text(r_pos, 0.2, 'R = '+str(round(pr,2)), fontsize=28, verticalalignment='top')
 
     # Set labels on joint
     ax_joint.set_xlabel(xlabel, fontsize=28)
