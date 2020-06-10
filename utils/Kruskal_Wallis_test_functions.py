@@ -76,7 +76,7 @@ def run_anova(samples, linearize = False):
         return kruskal(samples[0], samples[1], samples[2], samples[3], samples[4], samples[5])
     
 
-def test_exon_bimodal_anova(PSI_tab, exon, pca_clust, clusters = 'AC', obs_min=0.5, linearize=False):
+def test_exon_bimodal_anova(PSI_tab, exon, pca_clust, clusters = 'AC', obs_min=0.5, linearize=False, n=3):
     '''
     Run Kruskal-Wallis test for one exon, to get significance in the differences 
     in PSI between multiple clusters. 
@@ -102,8 +102,11 @@ def test_exon_bimodal_anova(PSI_tab, exon, pca_clust, clusters = 'AC', obs_min=0
         if len(c_cells)/len(clust_cells) >= obs_min: # Make sure that minimum % of cells in the cluster is met
             psi = list(PSI_tab.loc[exon, c_cells]) # list of PSI observations of the exon in cluster
             cluster_psi.append(psi)
-    if len(cluster_psi) >= 3: # run the test only if the exon is observed in at least three different clusters
-        anova_p = run_anova(cluster_psi, linearize)[1] # p-value of the KW test
+    if len(cluster_psi) >= n: # run the test only if the exon is observed in at least n different clusters
+        try:
+            anova_p = run_anova(cluster_psi, linearize)[1] # p-value of the KW test
+        except:
+            anova_p = np.nan # if the test crashes for some reason
     else:
         anova_p = np.nan # not enough observations to run test
     return anova_p, len(cluster_psi), 10
@@ -112,7 +115,7 @@ def test_exon_bimodal_anova(PSI_tab, exon, pca_clust, clusters = 'AC', obs_min=0
 
 
 def cluster_anova_test(PSI_tab, pca_clust, clusters, correction = 'fdr_bh', 
-                          correct_multitest = True, obs_min = 0.5, linearize=False):
+                          correct_multitest = True, obs_min = 0.5, linearize=False, n=3):
     '''
     Runs the Kruskal-Wallis test for a PSI matrix, and a given set of clusters.
     It wraps the test_exon_bimodal_anova function for all exons.
@@ -138,7 +141,7 @@ def cluster_anova_test(PSI_tab, pca_clust, clusters, correction = 'fdr_bh',
     for i in tqdm(range(len(PSI_tab.index))):
         
         exon = PSI_tab.index[i]
-        anv_p, pos, neg = test_exon_bimodal_anova(PSI_tab, exon, pca_clust, clusters = 'AC', obs_min=obs_min, linearize=linearize)
+        anv_p, pos, neg = test_exon_bimodal_anova(PSI_tab, exon, pca_clust, clusters = 'AC', obs_min=obs_min, linearize=linearize, n=n)
         if not np.isnan(anv_p):
             cluster_array.append(pos/(neg+pos))
             pvals.append(anv_p)
@@ -165,7 +168,7 @@ def cluster_anova_test(PSI_tab, pca_clust, clusters, correction = 'fdr_bh',
 
 def test_anova_filters(PSI_tab, mrna_counts, mrna_per_event, read_counts, coverage_tab, pca_clust, clusters = 'AC',
                      psi_min = 0.2, obs_min = 0.5, mrna_min = 10, mrna_read_min=0, read_min = 10, filter_obs = False, 
-                    dset_name = '', correct_multitest = False, linearize=False):
+                    dset_name = '', correct_multitest = False, linearize=False, n=3):
     '''
     Wrapper function that manages the run of the Kruskal-Wallis test in the dataset, in addition to
     running basic filtering and exon selection functions. At the moment of writing this note, many parts 
@@ -225,10 +228,10 @@ def test_anova_filters(PSI_tab, mrna_counts, mrna_per_event, read_counts, covera
     print('intermediate exons: ' + str(len(joint_idx)))
     
     if filter_obs:
-        change_tab = cluster_anova_test(aver_all[0].loc[joint_idx], pca_clust, clusters, obs_min=obs_min, linearize=linearize)
-        change_tab_reads = cluster_anova_test(aver_all_reads[0].loc[joint_idx], pca_clust, clusters, obs_min=obs_min, linearize=linearize)
+        change_tab = cluster_anova_test(aver_all[0].loc[joint_idx], pca_clust, clusters, obs_min=obs_min, linearize=linearize, n=n)
+        change_tab_reads = cluster_anova_test(aver_all_reads[0].loc[joint_idx], pca_clust, clusters, obs_min=obs_min, linearize=linearize, n=n)
     else:
-        change_tab = cluster_anova_test(PSI_tab.loc[joint_idx], pca_clust, clusters, obs_min=obs_min, linearize=linearize)
+        change_tab = cluster_anova_test(PSI_tab.loc[joint_idx], pca_clust, clusters, obs_min=obs_min, linearize=linearize, n=n)
         
     if correct_multitest:
         adj_pvals = multipletests(list(change_tab.pvals), method='fdr_bh')[1]

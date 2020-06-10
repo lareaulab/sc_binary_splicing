@@ -566,7 +566,7 @@ chen_mock_dict = get_mock_dict(chen_PSI.loc[test_exons], chen_norm_PSI.loc[test_
 pgamma_chen = get_C_score_pval_gamma(chen_PSI.loc[test_exons], chen_norm_PSI.loc[test_exons], 
                                 W_chen, test_exons, 488, chen_mock_dict)
 
-pgamma_chen.to_csv('pgamma_chen.tab', sep='\t', header=True, index=True)
+pgamma_chen.to_csv('autocorrelation_results/chen.autocorrelation.tab', sep='\t', header=True, index=True)
 
 
 
@@ -601,7 +601,7 @@ trapnell_mock_dict = get_mock_dict(trapnell_PSI.loc[test_exons], trapnell_norm_P
 pgamma_trapnell = get_C_score_pval_gamma(trapnell_PSI.loc[test_exons], trapnell_norm_PSI.loc[test_exons], 
                                 W_trapnell, test_exons, len(trapnell_PSI.columns), trapnell_mock_dict)
 
-pgamma_trapnell.to_csv('pgamma_trapnell.tab', sep='\t', header=True, index=True)
+pgamma_trapnell.to_csv('autocorrelation_results/trapnell.autocorrelation.tab', sep='\t', header=True, index=True)
 
 
 
@@ -628,7 +628,7 @@ song_mock_dict = get_mock_dict(song_PSI.loc[test_exons], song_norm_PSI.loc[test_
 pgamma_song = get_C_score_pval_gamma(song_PSI.loc[test_exons], song_norm_PSI.loc[test_exons], 
                                 W_song, test_exons, len(song_PSI.columns), song_mock_dict)
 
-pgamma_song.to_csv('pgamma_song.tab', sep='\t', header=True, index=True)
+pgamma_song.to_csv('autocorrelation_results/song.autocorrelation.tab', sep='\t', header=True, index=True)
 
 
 ########################
