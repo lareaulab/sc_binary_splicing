@@ -421,7 +421,10 @@ def get_statistics(pvals, selected_exons, x, beta):
     FP = X2 & X3
     FN = X1 & X4
 
-    recall = len(TP)/len(X1) # Also called sensitivity, or TPR
+    try:
+        recall = len(TP)/len(X1) # Also called sensitivity, or TPR
+    except:
+        recall = np.nan
     precision = len(TP)/len(X3)
     specificity = len(TN)/len(X2)
     try:
@@ -759,7 +762,7 @@ def plot_curves(ax, test_data, which_curve = 0, p_max = 0.1, p_min = 0.00001, st
              'LR+', 'LR-', 'Diagnostic Odds Ratio', 'Accuracy', 'Balanced Accuracy']
     
     name = names[which_curve]    
-    pvals, selected_mrna, selected_mrna_only, selected_read = test_data
+    pvals, selected_mrna, selected_read = test_data
     p_limits = 10**(-np.arange(-np.log10(p_max), -np.log10(p_min)+steps, steps))
     summary_mrna = summary_curves(pvals, selected_mrna, p_limits, 1)[which_curve]
     summary_read = summary_curves(pvals, selected_read, p_limits, 1)[which_curve]
