@@ -53,8 +53,8 @@ and the analysis of simulations and theoretical calculations are documented here
 
 R scripts and results for the simulations are found in:
 
-[**results/simulations/**](results/simulations/)
+[**results/simulations/**](results/simulations/standard_bias)
 
-A midified version of SymSim used to run the simulations is found in:
+The simulations in this paper use SymSim. A copy of SymSim used to run the simulations is found in:
 
-[**results/simulations/SymSim/**](results/simulations/SymSim)
+[**results/simulations/SymSim/**](results/simulations/standard_bias/SymSim)
